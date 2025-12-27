@@ -11,6 +11,7 @@ import { MongoIdValidator, Logger } from "@/utils";
 import { PaginatedResult } from "../types/pagination.types";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
+import { UserAdapter } from "../adapters";
 
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -18,7 +19,8 @@ export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly bcryptService: BcryptService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly userAdapter: UserAdapter
   ) {}
 
   async create(data: CreateUserDto): Promise<IAuthResponse> {
@@ -49,7 +51,7 @@ export class UserService {
 
     return {
       token,
-      user: this.formatUserResponse(user),
+      user: this.userAdapter.toResponse(user),
     };
   }
 
@@ -71,7 +73,7 @@ export class UserService {
     }
 
     this.logger.debug(`Usuário encontrado: ${id}`);
-    return this.formatUserResponse(user);
+    return this.userAdapter.toResponse(user);
   }
 
   async findAll(
@@ -91,7 +93,7 @@ export class UserService {
     );
 
     return {
-      data: result.data.map(this.formatUserResponse),
+      data: this.userAdapter.toResponseList(result.data),
       pagination: result.pagination,
     };
   }
@@ -109,14 +111,5 @@ export class UserService {
     }
 
     this.logger.log(`Usuário deletado com sucesso: ${id}`);
-  }
-
-  private formatUserResponse(user: any): IUserResponse {
-    return {
-      id: user._id.toString(),
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
   }
 }

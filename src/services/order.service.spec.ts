@@ -5,6 +5,7 @@ import { MongoIdValidator } from "../utils/mongo-id.validator";
 import { OrderStateMachine } from "../utils/order-state-machine";
 import { OrderState, OrderStatus } from "../types/enums";
 import { BadRequestException, NotFoundException } from "../exceptions";
+import { OrderAdapter } from "../adapters";
 
 vi.mock("../utils/mongo-id.validator");
 
@@ -21,7 +22,9 @@ describe("OrderService", () => {
       softDelete: vi.fn(),
     } as any;
 
-    orderService = new OrderService(orderRepository);
+    const orderAdapter = new OrderAdapter();
+
+    orderService = new OrderService(orderRepository, orderAdapter);
     vi.clearAllMocks();
   });
 

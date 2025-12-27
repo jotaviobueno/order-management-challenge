@@ -6,11 +6,15 @@ import { BadRequestException, NotFoundException } from "../exceptions";
 import { MongoIdValidator, Logger } from "@/utils";
 import { OrderStateMachine } from "../utils/order-state-machine";
 import { OrderState } from "@/types";
+import { OrderAdapter } from "../adapters";
 
 export class OrderService {
   private readonly logger = new Logger(OrderService.name);
 
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(
+    private readonly orderRepository: OrderRepository,
+    private readonly orderAdapter: OrderAdapter
+  ) {}
 
   async create(data: CreateOrderDto): Promise<IOrderResponse> {
     this.logger.log(`Tentando criar pedido para paciente: ${data.patient}`);
@@ -37,7 +41,7 @@ export class OrderService {
     this.logger.log(
       `Pedido criado com sucesso: ${order._id} - Estado: ${order.state}`
     );
-    return this.formatOrderResponse(order);
+    return this.orderAdapter.toResponse(order);
   }
 
   async findById(id: string): Promise<IOrderResponse> {
@@ -57,7 +61,7 @@ export class OrderService {
     }
 
     this.logger.debug(`Pedido encontrado: ${id}`);
-    return this.formatOrderResponse(order);
+    return this.orderAdapter.toResponse(order);
   }
 
   async findAll(
@@ -80,7 +84,7 @@ export class OrderService {
     );
 
     return {
-      data: result.data.map(this.formatOrderResponse),
+      data: this.orderAdapter.toResponseList(result.data),
       pagination: result.pagination,
     };
   }
@@ -127,7 +131,7 @@ export class OrderService {
 
     this.logger.log(`Pedido ${id} avançado com sucesso para ${nextState}`);
 
-    return this.formatOrderResponse(updatedOrder);
+    return this.orderAdapter.toResponse(updatedOrder);
   }
 
   async softDelete(id: string): Promise<void> {
@@ -150,19 +154,5 @@ export class OrderService {
     }
 
     this.logger.log(`Pedido deletado com sucesso: ${id}`);
-  }
-
-  private formatOrderResponse(order: any): IOrderResponse {
-    return {
-      id: order._id.toString(),
-      lab: order.lab,
-      patient: order.patient,
-      customer: order.customer,
-      state: order.state,
-      status: order.status,
-      services: order.services,
-      createdAt: order.createdAt,
-      updatedAt: order.updatedAt,
-    };
   }
 }

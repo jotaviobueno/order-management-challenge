@@ -9,6 +9,7 @@ import {
   ConflictException,
   NotFoundException,
 } from "../exceptions";
+import { UserAdapter } from "../adapters";
 
 vi.mock("../utils/bcrypt");
 vi.mock("../utils/jwt");
@@ -39,7 +40,14 @@ describe("UserService", () => {
       verify: vi.fn(),
     } as any;
 
-    userService = new UserService(userRepository, bcryptService, jwtService);
+    const userAdapter = new UserAdapter();
+
+    userService = new UserService(
+      userRepository,
+      bcryptService,
+      jwtService,
+      userAdapter
+    );
     vi.clearAllMocks();
   });
 

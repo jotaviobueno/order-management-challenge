@@ -6,14 +6,18 @@ import { createOrderSchema, listOrdersQuerySchema } from "../dtos/order.dto";
 import { OrderService } from "../services/order.service";
 import { OrderRepository } from "../repositories/order.repository";
 import { JwtService } from "../utils";
+import { OrderAdapter } from "@/adapters";
 
 const router = Router();
 const jwtService = new JwtService();
-const orderRepository = new OrderRepository();
-const orderService = new OrderService(orderRepository);
-const orderController = new OrderController(orderService);
 
 const authMiddleware = new AuthMiddleware(jwtService);
+const orderRepository = new OrderRepository();
+const orderAdapter = new OrderAdapter();
+
+const orderService = new OrderService(orderRepository, orderAdapter);
+
+const orderController = new OrderController(orderService);
 
 router.use(authMiddleware.execute);
 router.post(

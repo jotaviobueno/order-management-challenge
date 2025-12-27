@@ -4,6 +4,7 @@ import { UserRepository } from "../repositories/user.repository";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
 import { UnauthorizedException } from "../exceptions";
+import { OrderAdapter, UserAdapter } from "../adapters";
 
 vi.mock("../utils/bcrypt");
 vi.mock("../utils/jwt");
@@ -29,7 +30,14 @@ describe("AuthService", () => {
       verify: vi.fn(),
     } as any;
 
-    authService = new AuthService(userRepository, bcryptService, jwtService);
+    const userAdapter = new UserAdapter();
+
+    authService = new AuthService(
+      userRepository,
+      bcryptService,
+      jwtService,
+      userAdapter
+    );
     vi.clearAllMocks();
   });
 

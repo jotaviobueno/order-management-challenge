@@ -5,6 +5,7 @@ import { JwtService } from "../utils/jwt";
 import { UnauthorizedException } from "../exceptions";
 import { IAuthResponse } from "@/types";
 import { Logger } from "@/utils";
+import { UserAdapter } from "../adapters";
 
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
@@ -12,7 +13,8 @@ export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly bcryptService: BcryptService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly userAdapter: UserAdapter
   ) {}
 
   async login(data: LoginUserDto): Promise<IAuthResponse> {
@@ -40,12 +42,7 @@ export class AuthService {
 
     return {
       token,
-      user: {
-        id: user._id.toString(),
-        email: user.email,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
+      user: this.userAdapter.toResponse(user),
     };
   }
 }
