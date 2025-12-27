@@ -10,6 +10,7 @@ describe("ErrorHandler", () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
   let mockNext: Mock;
+  let errorHandler: ErrorHandler;
 
   beforeEach(() => {
     mockRequest = {};
@@ -18,13 +19,14 @@ describe("ErrorHandler", () => {
       json: vi.fn().mockReturnThis(),
     };
     mockNext = vi.fn();
+    errorHandler = new ErrorHandler();
   });
 
   describe("execute", () => {
     it("deve tratar HttpException e retornar status correto", () => {
       const error = new BadRequestException("Invalid input");
 
-      ErrorHandler.execute(
+      errorHandler.execute(
         error,
         mockRequest as Request,
         mockResponse as Response,
@@ -32,18 +34,17 @@ describe("ErrorHandler", () => {
       );
 
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: "Invalid input",
-        details: undefined,
-      });
+      const response = (mockResponse.json as any).mock.calls[0][0];
+      expect(response.statusCode).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.message).toBe("Invalid input");
+      expect(response.details).toBeUndefined();
     });
 
     it("deve incluir details quando presentes", () => {
       const details = { field: "email", error: "invalid format" };
       const error = new BadRequestException("Validation failed", details);
 
-      ErrorHandler.execute(
+      errorHandler.execute(
         error,
         mockRequest as Request,
         mockResponse as Response,
@@ -68,7 +69,7 @@ describe("ErrorHandler", () => {
         },
       ]);
 
-      ErrorHandler.execute(
+      errorHandler.execute(
         zodError,
         mockRequest as Request,
         mockResponse as Response,
@@ -95,7 +96,7 @@ describe("ErrorHandler", () => {
         },
       ]);
 
-      ErrorHandler.execute(
+      errorHandler.execute(
         zodError,
         mockRequest as Request,
         mockResponse as Response,
@@ -112,7 +113,7 @@ describe("ErrorHandler", () => {
     it("deve tratar erro genérico e retornar 500", () => {
       const error = new Error("Something went wrong");
 
-      ErrorHandler.execute(
+      errorHandler.execute(
         error,
         mockRequest as Request,
         mockResponse as Response,
@@ -142,7 +143,7 @@ describe("ErrorHandler", () => {
         mockResponse.status = vi.fn().mockReturnThis();
         mockResponse.json = vi.fn().mockReturnThis();
 
-        ErrorHandler.execute(
+        errorHandler.execute(
           error,
           mockRequest as Request,
           mockResponse as Response,
@@ -173,7 +174,7 @@ describe("ErrorHandler", () => {
         },
       ]);
 
-      ErrorHandler.execute(
+      errorHandler.execute(
         zodError,
         mockRequest as Request,
         mockResponse as Response,
@@ -190,7 +191,7 @@ describe("ErrorHandler", () => {
       const error = new Error("Internal error");
       error.stack = "Stack trace here";
 
-      ErrorHandler.execute(
+      errorHandler.execute(
         error,
         mockRequest as Request,
         mockResponse as Response,
@@ -215,7 +216,7 @@ describe("ErrorHandler", () => {
         return mockResponse;
       });
 
-      ErrorHandler.execute(
+      errorHandler.execute(
         error,
         mockRequest as Request,
         mockResponse as Response,

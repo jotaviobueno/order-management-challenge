@@ -6,8 +6,9 @@ import { userRouter, authRouter, orderRouter } from "./routes";
 
 export const createApp = (): Application => {
   const app = express();
+  const metadataMiddleware = new MetadataMiddleware();
 
-  app.use(MetadataMiddleware.execute);
+  app.use(metadataMiddleware.execute);
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -20,7 +21,8 @@ export const createApp = (): Application => {
   app.use("/user", userRouter);
   app.use("/order", orderRouter);
 
-  app.use(ErrorHandler.execute);
+  const errorHandler = new ErrorHandler();
+  app.use(errorHandler.execute);
 
   return app;
 };

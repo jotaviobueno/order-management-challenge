@@ -5,7 +5,7 @@ import { HttpException } from "./http.exception";
 import { HttpStatus } from "./http-status.enum";
 
 export class ErrorHandler {
-  static execute(
+  execute(
     error: Error,
     _req: Request,
     res: Response,

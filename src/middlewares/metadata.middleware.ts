@@ -14,7 +14,7 @@ import { randomUUID } from "crypto";
 export class MetadataMiddleware {
   private static logger = new Logger("MetadataMiddleware");
 
-  static execute(req: Request, res: Response, next: NextFunction): void {
+  execute(req: Request, res: Response, next: NextFunction): void {
     const url = req.originalUrl || req.url;
     const xRealIp = req.headers["x-real-ip"] as string;
     const xForwardedFor = req.headers["x-forwarded-for"] as string;
