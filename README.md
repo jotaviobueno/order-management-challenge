@@ -178,7 +178,7 @@ Authorization: Bearer <seu-token>
 
 Este projeto segue boas práticas de desenvolvimento:
 
-- **Arquitetura em camadas** (Models, DTOs, Middlewares)
+- **Arquitetura em camadas** (Models, Dtos, Middlewares)
 - **Tipagem forte** com TypeScript
 - **Validação de dados** com Zod
 - **Tratamento de erros** centralizado

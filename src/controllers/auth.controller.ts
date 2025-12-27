@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../services/auth.service";
-import { LoginUserDTO } from "../dtos/auth.dto";
+import { LoginUserDto } from "../dtos/auth.dto";
 import { HttpStatus } from "../exceptions";
 
 export class AuthController {
@@ -16,7 +16,7 @@ export class AuthController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const data: LoginUserDTO = req.body;
+      const data: LoginUserDto = req.body;
       const result = await this.authService.login(data);
 
       res.status(HttpStatus.OK).json({

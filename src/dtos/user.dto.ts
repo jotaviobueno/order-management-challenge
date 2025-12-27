@@ -10,5 +10,5 @@ export const listUsersQuerySchema = z.object({
   limit: z.coerce.number().int().positive().max(100).default(10),
 });
 
-export type CreateUserDTO = z.infer<typeof createUserSchema>;
-export type ListUsersQueryDTO = z.infer<typeof listUsersQuerySchema>;
+export type CreateUserDto = z.infer<typeof createUserSchema>;
+export type ListUsersQueryDto = z.infer<typeof listUsersQuerySchema>;

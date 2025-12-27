@@ -1,5 +1,5 @@
 import { UserRepository } from "../repositories/user.repository";
-import { CreateUserDTO, ListUsersQueryDTO } from "../dtos/user.dto";
+import { CreateUserDto, ListUsersQueryDto } from "../dtos/user.dto";
 import { IUserResponse } from "../types/user.types";
 import { BcryptService } from "../utils/bcrypt";
 import {
@@ -18,7 +18,7 @@ export class UserService {
     this.userRepository = new UserRepository();
   }
 
-  async create(data: CreateUserDTO): Promise<IUserResponse> {
+  async create(data: CreateUserDto): Promise<IUserResponse> {
     this.logger.log(`Tentando criar usuário: ${data.email}`);
 
     const existingUser = await this.userRepository.existsByEmail(data.email);
@@ -63,7 +63,7 @@ export class UserService {
   }
 
   async findAll(
-    query: ListUsersQueryDTO
+    query: ListUsersQueryDto
   ): Promise<PaginatedResult<IUserResponse>> {
     this.logger.debug(
       `Buscando usuários - Página: ${query.page}, Limite: ${query.limit}`

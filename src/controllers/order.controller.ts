@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { OrderService } from "../services/order.service";
-import { CreateOrderDTO, ListOrdersQueryDTO } from "../dtos/order.dto";
+import { CreateOrderDto, ListOrdersQueryDto } from "../dtos/order.dto";
 import { HttpStatus } from "../exceptions";
 
 export class OrderController {
@@ -16,7 +16,7 @@ export class OrderController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const data: CreateOrderDTO = req.body;
+      const data: CreateOrderDto = req.body;
       const result = await this.orderService.create(data);
 
       res.status(HttpStatus.CREATED).json({
@@ -51,7 +51,7 @@ export class OrderController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const query: ListOrdersQueryDTO = {
+      const query: ListOrdersQueryDto = {
         page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
         limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
         state: req.query.state as any,

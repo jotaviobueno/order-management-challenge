@@ -1,5 +1,5 @@
 import { UserRepository } from "../repositories/user.repository";
-import { LoginUserDTO } from "../dtos/auth.dto";
+import { LoginUserDto } from "../dtos/auth.dto";
 import { IUserResponse } from "../types/user.types";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
@@ -13,7 +13,7 @@ export class AuthService {
     this.userRepository = new UserRepository();
   }
 
-  async login(data: LoginUserDTO): Promise<ILoginResponse> {
+  async login(data: LoginUserDto): Promise<ILoginResponse> {
     const user = await this.userRepository.getByEmail(data.email);
 
     if (!user) {

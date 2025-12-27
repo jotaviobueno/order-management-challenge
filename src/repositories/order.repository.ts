@@ -1,6 +1,6 @@
 import { Order } from "../models/order";
 import { IOrder } from "../types/order.types";
-import { CreateOrderDTO } from "../dtos/order.dto";
+import { CreateOrderDto } from "../dtos/order.dto";
 import { OrderState, OrderStatus } from "../types/enums";
 import { PaginationOptions, PaginatedResult } from "../types/pagination.types";
 
@@ -9,7 +9,7 @@ export interface OrderPaginationOptions extends PaginationOptions {
 }
 
 export class OrderRepository {
-  async create(data: CreateOrderDTO): Promise<IOrder> {
+  async create(data: CreateOrderDto): Promise<IOrder> {
     const order = new Order({
       ...data,
       state: OrderState.CREATED,

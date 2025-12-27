@@ -1,6 +1,6 @@
 import { OrderRepository } from "../repositories/order.repository";
 import { PaginatedResult } from "../types/pagination.types";
-import { CreateOrderDTO, ListOrdersQueryDTO } from "../dtos/order.dto";
+import { CreateOrderDto, ListOrdersQueryDto } from "../dtos/order.dto";
 import { IOrderResponse } from "../types/order.types";
 import { BadRequestException, NotFoundException } from "../exceptions";
 import { MongoIdValidator, Logger } from "@/utils";
@@ -15,7 +15,7 @@ export class OrderService {
     this.orderRepository = new OrderRepository();
   }
 
-  async create(data: CreateOrderDTO): Promise<IOrderResponse> {
+  async create(data: CreateOrderDto): Promise<IOrderResponse> {
     this.logger.log(`Tentando criar pedido para paciente: ${data.patient}`);
 
     const totalValue = data.services.reduce(
@@ -64,7 +64,7 @@ export class OrderService {
   }
 
   async findAll(
-    query: ListOrdersQueryDTO
+    query: ListOrdersQueryDto
   ): Promise<PaginatedResult<IOrderResponse>> {
     this.logger.debug(
       `Buscando pedidos - Página: ${query.page}, Limite: ${

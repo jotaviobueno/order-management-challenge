@@ -1,10 +1,10 @@
 import { User } from "../models/user";
 import { IUser } from "../types/user.types";
-import { CreateUserDTO } from "../dtos/user.dto";
+import { CreateUserDto } from "../dtos/user.dto";
 import { PaginationOptions, PaginatedResult } from "../types/pagination.types";
 
 export class UserRepository {
-  create(data: CreateUserDTO): Promise<IUser> {
+  create(data: CreateUserDto): Promise<IUser> {
     const user = new User({
       ...data,
       deletedAt: null,

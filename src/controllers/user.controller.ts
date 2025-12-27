@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../services/user.service";
-import { CreateUserDTO, ListUsersQueryDTO } from "../dtos/user.dto";
+import { CreateUserDto, ListUsersQueryDto } from "../dtos/user.dto";
 import { HttpStatus } from "../exceptions";
 
 export class UserController {
@@ -16,7 +16,7 @@ export class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const data: CreateUserDTO = req.body;
+      const data: CreateUserDto = req.body;
       const result = await this.userService.create(data);
 
       res.status(HttpStatus.CREATED).json({
@@ -52,7 +52,7 @@ export class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const query: ListUsersQueryDTO = {
+      const query: ListUsersQueryDto = {
         page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
         limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
       };

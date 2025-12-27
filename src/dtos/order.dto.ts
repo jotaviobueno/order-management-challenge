@@ -41,5 +41,5 @@ export const listOrdersQuerySchema = z.object({
   state: z.nativeEnum(OrderState).optional(),
 });
 
-export type CreateOrderDTO = z.infer<typeof createOrderSchema>;
-export type ListOrdersQueryDTO = z.infer<typeof listOrdersQuerySchema>;
+export type CreateOrderDto = z.infer<typeof createOrderSchema>;
+export type ListOrdersQueryDto = z.infer<typeof listOrdersQuerySchema>;
