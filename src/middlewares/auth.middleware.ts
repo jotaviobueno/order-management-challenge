@@ -27,7 +27,7 @@ export class AuthMiddleware {
         const decoded = JwtService.verify(token);
         req.user = decoded;
 
-        AlsService.set(USER_ID_CONSTANT, decoded.userId);
+        AlsService.set(USER_ID_CONSTANT, decoded.sub);
         AlsService.set(EMAIL_CONSTANT, decoded.email);
 
         if (!AlsService.has(ACCESS_TOKEN_CONSTANT)) {

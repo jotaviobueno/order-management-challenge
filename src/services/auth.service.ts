@@ -30,7 +30,7 @@ export class AuthService {
     }
 
     const token = JwtService.generate({
-      userId: user._id.toString(),
+      sub: user._id.toString(),
       email: user.email,
     });
 

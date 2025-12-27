@@ -1,5 +1,5 @@
 export interface IAuthPayload {
-  userId: string;
+  sub: string;
   email: string;
 }
 

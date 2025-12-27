@@ -3,6 +3,7 @@ import { CreateUserDTO } from "../dtos/user.dto";
 import { IUserResponse } from "../types/user.types";
 import { BcryptService } from "../utils/bcrypt";
 import { ConflictException, NotFoundException } from "../exceptions";
+import { MongoIdValidator } from "@/utils";
 
 export class UserService {
   private userRepository: UserRepository;
@@ -29,11 +30,13 @@ export class UserService {
   }
 
   async findById(id: string): Promise<IUserResponse> {
+    const isMongoId = MongoIdValidator.isValid(id);
+
+    if (!isMongoId) throw new NotFoundException("Usuário não encontrado");
+
     const user = await this.userRepository.getById(id);
 
-    if (!user) {
-      throw new NotFoundException("Usuário não encontrado");
-    }
+    if (!user) throw new NotFoundException("Usuário não encontrado");
 
     return this.formatUserResponse(user);
   }
@@ -44,9 +47,11 @@ export class UserService {
   }
 
   async softDelete(id: string): Promise<void> {
-    const user = await this.userRepository.softDelete(id);
+    const user = await this.findById(id);
 
-    if (!user) {
+    const update = await this.userRepository.softDelete(user.id);
+
+    if (!update) {
       throw new NotFoundException("Usuário não encontrado");
     }
   }

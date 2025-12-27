@@ -35,6 +35,7 @@ export class UserController {
   ): Promise<void> => {
     try {
       const { id } = req.params;
+
       const user = await this.userService.findById(id);
 
       res.status(HttpStatus.OK).json({
@@ -68,6 +69,7 @@ export class UserController {
   ): Promise<void> => {
     try {
       const { id } = req.params;
+
       await this.userService.softDelete(id);
 
       res.status(HttpStatus.OK).json({
