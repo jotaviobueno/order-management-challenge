@@ -25,9 +25,8 @@ export class AuthService {
       user.password
     );
 
-    if (!isPasswordValid) {
+    if (!isPasswordValid)
       throw new UnauthorizedException("Credenciais inválidas");
-    }
 
     const token = JwtService.generate({
       sub: user._id.toString(),

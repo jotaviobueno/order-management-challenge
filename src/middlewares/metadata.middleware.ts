@@ -6,7 +6,6 @@ import {
   USER_AGENT_CONSTANT,
   ENDPOINT_CONSTANT,
   IP_ADDRESS_CONSTANT,
-  X_TRACING_ID_CONSTANT,
   START_TIME_CONSTANT,
   REQUEST_ID_CONSTANT,
 } from "../config/als.constants";
@@ -17,9 +16,6 @@ export class MetadataMiddleware {
 
   static execute(req: Request, res: Response, next: NextFunction): void {
     const url = req.originalUrl || req.url;
-
-    MetadataMiddleware.logger.log(`Iniciando endpoint: ${url}`);
-
     const xTracingId = req.headers["x-tracing-id"] as string;
     const xRealIp = req.headers["x-real-ip"] as string;
     const xForwardedFor = req.headers["x-forwarded-for"] as string;
@@ -45,7 +41,6 @@ export class MetadataMiddleware {
       [USER_AGENT_CONSTANT]: userAgent,
       [START_TIME_CONSTANT]: startTime,
       [IP_ADDRESS_CONSTANT]: ipAddress,
-      [X_TRACING_ID_CONSTANT]: xTracingId,
       [ACCESS_TOKEN_CONSTANT]: token,
     };
 
@@ -53,12 +48,13 @@ export class MetadataMiddleware {
       Object.entries(metadata).filter(([_, value]) => value !== undefined)
     );
 
-    AlsService.merge(cleanMetadata);
+    AlsService.run(cleanMetadata, () => {
+      MetadataMiddleware.logger.log(`Iniciando endpoint: ${url}`);
+      MetadataMiddleware.logger.debug(
+        `Metadata setado: ${JSON.stringify(cleanMetadata)}`
+      );
 
-    MetadataMiddleware.logger.debug(
-      `Metadata setado: ${JSON.stringify(cleanMetadata)}`
-    );
-
-    next();
+      next();
+    });
   }
 }

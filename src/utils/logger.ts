@@ -44,11 +44,10 @@ export class Logger {
       ? `${colors.dim}[${this.getTimestamp()}]${colors.reset} `
       : "";
 
-    const requestId = this.options.includeContext
-      ? AlsService.get<string>(REQUEST_ID_CONSTANT)
-      : undefined;
+    const requestId = AlsService.get<string>(REQUEST_ID_CONSTANT);
+
     const requestIdStr = requestId
-      ? `${colors.dim}[${requestId.substring(0, 8)}]${colors.reset} `
+      ? `${colors.cyan}[${requestId.substring(0, 8)}]${colors.reset} `
       : "";
 
     const ctx = context || this.context;
