@@ -1,6 +1,5 @@
 import { UserRepository } from "../repositories/user.repository";
 import { LoginUserDto } from "../dtos/auth.dto";
-import { IUserResponse } from "../types/user.types";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
 import { UnauthorizedException } from "../exceptions";
