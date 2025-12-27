@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { Request, Response } from "express";
 import { ErrorHandler } from "./error.handler";
 import { HttpException } from "./http.exception";
@@ -9,7 +9,7 @@ import { ZodError } from "zod";
 describe("ErrorHandler", () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
-  let mockNext: vi.Mock;
+  let mockNext: Mock;
 
   beforeEach(() => {
     mockRequest = {};

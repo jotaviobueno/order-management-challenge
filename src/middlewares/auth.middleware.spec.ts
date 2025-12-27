@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { Request, Response } from "express";
 import { AuthMiddleware } from "./auth.middleware";
 import { AlsService } from "../utils/async-context";
@@ -10,7 +10,7 @@ vi.mock("../utils/async-context");
 describe("AuthMiddleware", () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
-  let mockNext: vi.Mock;
+  let mockNext: Mock;
   let mockJwtService: any;
   let authMiddleware: AuthMiddleware;
 
@@ -56,7 +56,7 @@ describe("AuthMiddleware", () => {
       expect(AlsService.set).toHaveBeenCalledWith("userId", mockDecoded.sub);
       expect(AlsService.set).toHaveBeenCalledWith("email", mockDecoded.email);
       expect(AlsService.set).toHaveBeenCalledWith("accessToken", mockToken);
-      expect(mockRequest.user).toEqual(mockDecoded);
+      expect((mockRequest as any).user).toEqual(mockDecoded);
       expect(mockNext).toHaveBeenCalledWith();
     });
 
