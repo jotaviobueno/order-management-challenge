@@ -1,12 +1,12 @@
 import express, { Application } from "express";
 import cors from "cors";
 import { ErrorHandler } from "./exceptions";
-import { metadataMiddleware } from "./middlewares/metadata.middleware";
+import { MetadataMiddleware } from "./middlewares/metadata.middleware";
 
 export const createApp = (): Application => {
   const app = express();
 
-  app.use(metadataMiddleware);
+  app.use(MetadataMiddleware.execute);
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
