@@ -6,9 +6,10 @@ import { userRouter, authRouter, orderRouter } from "./routes";
 
 export const createApp = (): Application => {
   const app = express();
-  const metadataMiddleware = new MetadataMiddleware();
 
+  const metadataMiddleware = new MetadataMiddleware();
   app.use(metadataMiddleware.execute);
+
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
