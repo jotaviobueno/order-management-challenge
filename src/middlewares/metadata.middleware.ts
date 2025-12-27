@@ -16,7 +16,6 @@ export class MetadataMiddleware {
 
   static execute(req: Request, res: Response, next: NextFunction): void {
     const url = req.originalUrl || req.url;
-    const xTracingId = req.headers["x-tracing-id"] as string;
     const xRealIp = req.headers["x-real-ip"] as string;
     const xForwardedFor = req.headers["x-forwarded-for"] as string;
     const userAgent = req.headers["user-agent"] as string;
