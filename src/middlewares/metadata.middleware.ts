@@ -12,7 +12,7 @@ import {
 import { randomUUID } from "crypto";
 
 export class MetadataMiddleware {
-  private static logger = new Logger("MetadataMiddleware");
+  private static logger = new Logger(MetadataMiddleware.name);
 
   execute(req: Request, res: Response, next: NextFunction): void {
     const url = req.originalUrl || req.url;

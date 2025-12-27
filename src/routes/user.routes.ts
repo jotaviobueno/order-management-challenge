@@ -1,27 +1,9 @@
 import { Router } from "express";
-import { UserController } from "../controllers/user.controller";
 import { ValidateMiddleware } from "@/middlewares";
 import { createUserSchema, listUsersQuerySchema } from "@/dtos/user.dto";
-import { UserService } from "../services/user.service";
-import { UserRepository } from "../repositories/user.repository";
-import { BcryptService } from "../utils/bcrypt";
-import { JwtService } from "../utils/jwt";
-import { UserAdapter } from "@/adapters";
+import { userController } from "../container";
 
 const router = Router();
-const userRepository = new UserRepository();
-
-const bcryptService = new BcryptService();
-const jwtService = new JwtService();
-const userAdapter = new UserAdapter();
-
-const userService = new UserService(
-  userRepository,
-  bcryptService,
-  jwtService,
-  userAdapter
-);
-const userController = new UserController(userService);
 
 router.post(
   "/",

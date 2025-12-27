@@ -1,24 +1,9 @@
 import { Router } from "express";
-import { OrderController } from "../controllers/order.controller";
 import { ValidateMiddleware } from "../middlewares";
-import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { createOrderSchema, listOrdersQuerySchema } from "../dtos/order.dto";
-import { OrderService } from "../services/order.service";
-import { OrderRepository } from "../repositories/order.repository";
-import { JwtService } from "../utils";
-import { OrderAdapter } from "@/adapters";
+import { orderController, authMiddleware } from "../container";
 
 const router = Router();
-const jwtService = new JwtService();
-
-const authMiddleware = new AuthMiddleware(jwtService);
-const orderRepository = new OrderRepository();
-const orderAdapter = new OrderAdapter();
-
-const orderService = new OrderService(orderRepository, orderAdapter);
-
-const orderController = new OrderController(orderService);
-
 router.use(authMiddleware.execute);
 router.post(
   "/",
