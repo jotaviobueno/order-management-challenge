@@ -22,6 +22,23 @@ const userSchema = new Schema<IUser>(
       minlength: [6, "A senha deve ter no mínimo 6 caracteres"],
       select: false,
     },
+    createdAt: {
+      name: "created_at",
+      type: Date,
+      default: Date.now,
+      required: false,
+    },
+    updatedAt: {
+      name: "updated_at",
+      type: Date,
+      default: Date.now,
+      required: false,
+    },
+    deletedAt: {
+      name: "deleted_at",
+      type: Date,
+      required: false,
+    },
   },
   {
     timestamps: true,

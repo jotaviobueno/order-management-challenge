@@ -5,6 +5,7 @@ export interface IUser extends Document {
   password: string;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
 }
 
 export interface IUserResponse {
@@ -12,4 +13,5 @@ export interface IUserResponse {
   email: string;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date | null;
 }
