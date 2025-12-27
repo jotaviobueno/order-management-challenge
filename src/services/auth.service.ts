@@ -3,37 +3,49 @@ import { LoginUserDto } from "../dtos/auth.dto";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
 import { UnauthorizedException } from "../exceptions";
-import { ILoginResponse } from "@/types";
+import { IAuthResponse } from "@/types";
+import { Logger } from "@/utils";
 
 export class AuthService {
-  private userRepository: UserRepository;
+  private readonly logger = new Logger(AuthService.name);
 
-  constructor() {
-    this.userRepository = new UserRepository();
-  }
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly bcryptService: BcryptService,
+    private readonly jwtService: JwtService
+  ) {}
 
-  async login(data: LoginUserDto): Promise<ILoginResponse> {
+  async login(data: LoginUserDto): Promise<IAuthResponse> {
     const user = await this.userRepository.getByEmail(data.email);
 
     if (!user) {
+      this.logger.warn(`Tentativa de login com email inválido: ${data.email}`);
       throw new UnauthorizedException("Credenciais inválidas");
     }
 
-    const isPasswordValid = await BcryptService.compare(
+    const isPasswordValid = await this.bcryptService.compare(
       data.password,
       user.password
     );
 
-    if (!isPasswordValid)
+    if (!isPasswordValid) {
+      this.logger.warn(`Tentativa de login com senha inválida: ${data.email}`);
       throw new UnauthorizedException("Credenciais inválidas");
+    }
 
-    const token = JwtService.generate({
+    const token = this.jwtService.generate({
       sub: user._id.toString(),
       email: user.email,
     });
 
     return {
       token,
+      user: {
+        id: user._id.toString(),
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
     };
   }
 }

@@ -4,11 +4,7 @@ import { LoginUserDto } from "../dtos/auth.dto";
 import { HttpStatus } from "../exceptions";
 
 export class AuthController {
-  private authService: AuthService;
-
-  constructor() {
-    this.authService = new AuthService();
-  }
+  constructor(private readonly authService: AuthService) {}
 
   login = async (
     req: Request,

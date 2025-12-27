@@ -21,8 +21,7 @@ describe("OrderService", () => {
       softDelete: vi.fn(),
     } as any;
 
-    orderService = new OrderService();
-    (orderService as any).orderRepository = orderRepository;
+    orderService = new OrderService(orderRepository);
     vi.clearAllMocks();
   });
 

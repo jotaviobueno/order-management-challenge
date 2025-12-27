@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { JwtService } from "./jwt";
 import jwt from "jsonwebtoken";
 
@@ -12,6 +12,12 @@ vi.mock("../config/env", () => ({
 }));
 
 describe("JwtService", () => {
+  let jwtService: JwtService;
+
+  beforeEach(() => {
+    jwtService = new JwtService();
+  });
+
   describe("generate", () => {
     it("deve gerar token JWT válido", () => {
       const payload = {
@@ -19,7 +25,7 @@ describe("JwtService", () => {
         email: "test@test.com",
       };
 
-      const token = JwtService.generate(payload);
+      const token = jwtService.generate(payload);
 
       expect(token).toBeDefined();
       expect(typeof token).toBe("string");
@@ -32,7 +38,7 @@ describe("JwtService", () => {
         email: "user@test.com",
       };
 
-      const token = JwtService.generate(payload);
+      const token = jwtService.generate(payload);
       const decoded = jwt.decode(token) as any;
 
       expect(decoded.sub).toBe(payload.sub);
@@ -45,7 +51,7 @@ describe("JwtService", () => {
         email: "test@test.com",
       };
 
-      const token = JwtService.generate(payload);
+      const token = jwtService.generate(payload);
       const decoded = jwt.decode(token) as any;
 
       expect(decoded.exp).toBeDefined();
@@ -59,10 +65,10 @@ describe("JwtService", () => {
         email: "test@test.com",
       };
 
-      const token1 = JwtService.generate(payload);
+      const token1 = jwtService.generate(payload);
       vi.useFakeTimers();
       vi.advanceTimersByTime(1000);
-      const token2 = JwtService.generate(payload);
+      const token2 = jwtService.generate(payload);
       vi.useRealTimers();
 
       expect(token1).not.toBe(token2);
@@ -76,8 +82,8 @@ describe("JwtService", () => {
         email: "test@test.com",
       };
 
-      const token = JwtService.generate(payload);
-      const decoded = JwtService.verify(token);
+      const token = jwtService.generate(payload);
+      const decoded = jwtService.verify(token);
 
       expect(decoded.sub).toBe(payload.sub);
       expect(decoded.email).toBe(payload.email);
@@ -86,13 +92,13 @@ describe("JwtService", () => {
     it("deve lançar erro para token inválido", () => {
       const invalidToken = "invalid.token.here";
 
-      expect(() => JwtService.verify(invalidToken)).toThrow();
+      expect(() => jwtService.verify(invalidToken)).toThrow();
     });
 
     it("deve lançar erro para token malformado", () => {
       const malformedToken = "not-a-jwt-token";
 
-      expect(() => JwtService.verify(malformedToken)).toThrow();
+      expect(() => jwtService.verify(malformedToken)).toThrow();
     });
 
     it("deve lançar erro para token com assinatura inválida", () => {
@@ -103,11 +109,11 @@ describe("JwtService", () => {
 
       const token = jwt.sign(payload, "wrong-secret", { expiresIn: "1h" });
 
-      expect(() => JwtService.verify(token)).toThrow();
+      expect(() => jwtService.verify(token)).toThrow();
     });
 
     it("deve lançar erro para token vazio", () => {
-      expect(() => JwtService.verify("")).toThrow();
+      expect(() => jwtService.verify("")).toThrow();
     });
 
     it("deve preservar tipos de dados do payload", () => {
@@ -116,8 +122,8 @@ describe("JwtService", () => {
         email: "test@test.com",
       };
 
-      const token = JwtService.generate(payload);
-      const decoded = JwtService.verify(token);
+      const token = jwtService.generate(payload);
+      const decoded = jwtService.verify(token);
 
       expect(typeof decoded.sub).toBe("string");
       expect(typeof decoded.email).toBe("string");
@@ -133,8 +139,8 @@ describe("JwtService", () => {
       ];
 
       testCases.forEach((payload) => {
-        const token = JwtService.generate(payload);
-        const decoded = JwtService.verify(token);
+        const token = jwtService.generate(payload);
+        const decoded = jwtService.verify(token);
 
         expect(decoded.sub).toBe(payload.sub);
         expect(decoded.email).toBe(payload.email);
@@ -147,8 +153,8 @@ describe("JwtService", () => {
         email: "test+tag@example.com",
       };
 
-      const token = JwtService.generate(payload);
-      const decoded = JwtService.verify(token);
+      const token = jwtService.generate(payload);
+      const decoded = jwtService.verify(token);
 
       expect(decoded.sub).toBe(payload.sub);
       expect(decoded.email).toBe(payload.email);

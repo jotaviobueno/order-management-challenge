@@ -4,11 +4,7 @@ import { CreateUserDto, ListUsersQueryDto } from "../dtos/user.dto";
 import { HttpStatus } from "../exceptions";
 
 export class UserController {
-  private userService: UserService;
-
-  constructor() {
-    this.userService = new UserService();
-  }
+  constructor(private readonly userService: UserService) {}
 
   create = async (
     req: Request,

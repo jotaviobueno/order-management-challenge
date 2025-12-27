@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Request, Response } from "express";
 import { AuthMiddleware } from "./auth.middleware";
-import { JwtService } from "../utils/jwt";
 import { AlsService } from "../utils/async-context";
 import { UnauthorizedException } from "../exceptions";
 
@@ -12,6 +11,8 @@ describe("AuthMiddleware", () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
   let mockNext: vi.Mock;
+  let mockJwtService: any;
+  let authMiddleware: AuthMiddleware;
 
   beforeEach(() => {
     mockRequest = {
@@ -19,6 +20,13 @@ describe("AuthMiddleware", () => {
     };
     mockResponse = {};
     mockNext = vi.fn();
+
+    mockJwtService = {
+      verify: vi.fn(),
+      generate: vi.fn(),
+    };
+
+    authMiddleware = new AuthMiddleware(mockJwtService);
     vi.clearAllMocks();
   });
 
@@ -34,17 +42,17 @@ describe("AuthMiddleware", () => {
         authorization: `Bearer ${mockToken}`,
       };
 
-      vi.spyOn(JwtService, "verify").mockReturnValue(mockDecoded);
+      mockJwtService.verify.mockReturnValue(mockDecoded);
       vi.spyOn(AlsService, "set");
       vi.spyOn(AlsService, "has").mockReturnValue(false);
 
-      await AuthMiddleware.execute(
+      await authMiddleware.execute(
         mockRequest as Request,
         mockResponse as Response,
         mockNext
       );
 
-      expect(JwtService.verify).toHaveBeenCalledWith(mockToken);
+      expect(mockJwtService.verify).toHaveBeenCalledWith(mockToken);
       expect(AlsService.set).toHaveBeenCalledWith("userId", mockDecoded.sub);
       expect(AlsService.set).toHaveBeenCalledWith("email", mockDecoded.email);
       expect(AlsService.set).toHaveBeenCalledWith("accessToken", mockToken);
@@ -55,7 +63,7 @@ describe("AuthMiddleware", () => {
     it("deve lançar UnauthorizedException se authorization header não existir", async () => {
       mockRequest.headers = {};
 
-      await AuthMiddleware.execute(
+      await authMiddleware.execute(
         mockRequest as Request,
         mockResponse as Response,
         mockNext
@@ -72,7 +80,7 @@ describe("AuthMiddleware", () => {
         authorization: "InvalidFormat token",
       };
 
-      await AuthMiddleware.execute(
+      await authMiddleware.execute(
         mockRequest as Request,
         mockResponse as Response,
         mockNext
@@ -89,11 +97,11 @@ describe("AuthMiddleware", () => {
         authorization: "Bearer invalid.token",
       };
 
-      vi.spyOn(JwtService, "verify").mockImplementation(() => {
+      mockJwtService.verify.mockImplementation(() => {
         throw new Error("Invalid token");
       });
 
-      await AuthMiddleware.execute(
+      await authMiddleware.execute(
         mockRequest as Request,
         mockResponse as Response,
         mockNext
@@ -110,13 +118,13 @@ describe("AuthMiddleware", () => {
         authorization: "Bearer expired.token",
       };
 
-      vi.spyOn(JwtService, "verify").mockImplementation(() => {
+      mockJwtService.verify.mockImplementation(() => {
         const error: any = new Error("jwt expired");
         error.name = "TokenExpiredError";
         throw error;
       });
 
-      await AuthMiddleware.execute(
+      await authMiddleware.execute(
         mockRequest as Request,
         mockResponse as Response,
         mockNext
@@ -139,11 +147,11 @@ describe("AuthMiddleware", () => {
         authorization: `Bearer ${mockToken}`,
       };
 
-      vi.spyOn(JwtService, "verify").mockReturnValue(mockDecoded);
+      mockJwtService.verify.mockReturnValue(mockDecoded);
       vi.spyOn(AlsService, "set");
       vi.spyOn(AlsService, "has").mockReturnValue(true);
 
-      await AuthMiddleware.execute(
+      await authMiddleware.execute(
         mockRequest as Request,
         mockResponse as Response,
         mockNext
@@ -165,19 +173,18 @@ describe("AuthMiddleware", () => {
         authorization: `Bearer ${mockToken}`,
       };
 
-      const verifySpy = vi
-        .spyOn(JwtService, "verify")
-        .mockReturnValue(mockDecoded);
+      mockJwtService.verify.mockReturnValue(mockDecoded);
+      const verifySpy = mockJwtService.verify;
       vi.spyOn(AlsService, "set");
       vi.spyOn(AlsService, "has").mockReturnValue(false);
 
-      await AuthMiddleware.execute(
+      await authMiddleware.execute(
         mockRequest as Request,
         mockResponse as Response,
         mockNext
       );
 
-      expect(verifySpy).toHaveBeenCalledWith(mockToken);
+      expect(mockJwtService.verify).toHaveBeenCalledWith(mockToken);
     });
   });
 });

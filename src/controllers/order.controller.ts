@@ -4,11 +4,7 @@ import { CreateOrderDto, ListOrdersQueryDto } from "../dtos/order.dto";
 import { HttpStatus } from "../exceptions";
 
 export class OrderController {
-  private orderService: OrderService;
-
-  constructor() {
-    this.orderService = new OrderService();
-  }
+  constructor(private readonly orderService: OrderService) {}
 
   create = async (
     req: Request,

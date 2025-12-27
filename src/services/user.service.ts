@@ -1,7 +1,7 @@
 import { UserRepository } from "../repositories/user.repository";
 import { CreateUserDto, ListUsersQueryDto } from "../dtos/user.dto";
 import { IUserResponse } from "../types/user.types";
-import { BcryptService } from "../utils/bcrypt";
+import { IAuthResponse } from "../types/auth.types";
 import {
   BadRequestException,
   ConflictException,
@@ -9,16 +9,19 @@ import {
 } from "../exceptions";
 import { MongoIdValidator, Logger } from "@/utils";
 import { PaginatedResult } from "../types/pagination.types";
+import { BcryptService } from "../utils/bcrypt";
+import { JwtService } from "../utils/jwt";
 
 export class UserService {
   private readonly logger = new Logger(UserService.name);
-  private userRepository: UserRepository;
 
-  constructor() {
-    this.userRepository = new UserRepository();
-  }
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly bcryptService: BcryptService,
+    private readonly jwtService: JwtService
+  ) {}
 
-  async create(data: CreateUserDto): Promise<IUserResponse> {
+  async create(data: CreateUserDto): Promise<IAuthResponse> {
     this.logger.log(`Tentando criar usuário: ${data.email}`);
 
     const existingUser = await this.userRepository.existsByEmail(data.email);
@@ -30,15 +33,24 @@ export class UserService {
       throw new ConflictException("Email já cadastrado");
     }
 
-    const hashedPassword = await BcryptService.hash(data.password);
+    const hashedPassword = await this.bcryptService.hash(data.password);
 
     const user = await this.userRepository.create({
       ...data,
       password: hashedPassword,
     });
 
+    const token = this.jwtService.generate({
+      sub: user._id.toString(),
+      email: user.email,
+    });
+
     this.logger.log(`Usuário criado com sucesso: ${user._id} - ${data.email}`);
-    return this.formatUserResponse(user);
+
+    return {
+      token,
+      user: this.formatUserResponse(user),
+    };
   }
 
   async findById(id: string): Promise<IUserResponse> {

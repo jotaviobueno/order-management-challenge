@@ -1,12 +1,17 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { BcryptService } from "./bcrypt";
 
 describe("BcryptService", () => {
+  let bcryptService: BcryptService;
+
+  beforeEach(() => {
+    bcryptService = new BcryptService();
+  });
   describe("hash", () => {
     it("deve gerar hash de senha", async () => {
       const password = "mySecurePassword123";
 
-      const hash = await BcryptService.hash(password);
+      const hash = await bcryptService.hash(password);
 
       expect(hash).toBeDefined();
       expect(hash).not.toBe(password);
@@ -17,8 +22,8 @@ describe("BcryptService", () => {
     it("deve gerar hashes diferentes para mesma senha", async () => {
       const password = "samePassword";
 
-      const hash1 = await BcryptService.hash(password);
-      const hash2 = await BcryptService.hash(password);
+      const hash1 = await bcryptService.hash(password);
+      const hash2 = await bcryptService.hash(password);
 
       expect(hash1).not.toBe(hash2);
     });
@@ -26,7 +31,7 @@ describe("BcryptService", () => {
     it("deve gerar hash para senha vazia", async () => {
       const password = "";
 
-      const hash = await BcryptService.hash(password);
+      const hash = await bcryptService.hash(password);
 
       expect(hash).toBeDefined();
       expect(hash.length).toBeGreaterThan(0);
@@ -35,7 +40,7 @@ describe("BcryptService", () => {
     it("deve gerar hash para senha com caracteres especiais", async () => {
       const password = "P@ssw0rd!#$%^&*()";
 
-      const hash = await BcryptService.hash(password);
+      const hash = await bcryptService.hash(password);
 
       expect(hash).toBeDefined();
       expect(hash).toMatch(/^\$2[ayb]\$.{56}$/);
@@ -45,9 +50,9 @@ describe("BcryptService", () => {
   describe("compare", () => {
     it("deve retornar true para senha correta", async () => {
       const password = "correctPassword";
-      const hash = await BcryptService.hash(password);
+      const hash = await bcryptService.hash(password);
 
-      const result = await BcryptService.compare(password, hash);
+      const result = await bcryptService.compare(password, hash);
 
       expect(result).toBe(true);
     });
@@ -55,29 +60,29 @@ describe("BcryptService", () => {
     it("deve retornar false para senha incorreta", async () => {
       const password = "correctPassword";
       const wrongPassword = "wrongPassword";
-      const hash = await BcryptService.hash(password);
+      const hash = await bcryptService.hash(password);
 
-      const result = await BcryptService.compare(wrongPassword, hash);
+      const result = await bcryptService.compare(wrongPassword, hash);
 
       expect(result).toBe(false);
     });
 
     it("deve retornar false para senha vazia quando hash não é vazio", async () => {
       const password = "somePassword";
-      const hash = await BcryptService.hash(password);
+      const hash = await bcryptService.hash(password);
 
-      const result = await BcryptService.compare("", hash);
+      const result = await bcryptService.compare("", hash);
 
       expect(result).toBe(false);
     });
 
     it("deve ser case sensitive", async () => {
       const password = "MyPassword";
-      const hash = await BcryptService.hash(password);
+      const hash = await bcryptService.hash(password);
 
-      const resultLower = await BcryptService.compare("mypassword", hash);
-      const resultUpper = await BcryptService.compare("MYPASSWORD", hash);
-      const resultCorrect = await BcryptService.compare("MyPassword", hash);
+      const resultLower = await bcryptService.compare("mypassword", hash);
+      const resultUpper = await bcryptService.compare("MYPASSWORD", hash);
+      const resultCorrect = await bcryptService.compare("MyPassword", hash);
 
       expect(resultLower).toBe(false);
       expect(resultUpper).toBe(false);
@@ -86,18 +91,18 @@ describe("BcryptService", () => {
 
     it("deve validar senhas com caracteres especiais", async () => {
       const password = "P@ss!#$123";
-      const hash = await BcryptService.hash(password);
+      const hash = await bcryptService.hash(password);
 
-      const result = await BcryptService.compare(password, hash);
+      const result = await bcryptService.compare(password, hash);
 
       expect(result).toBe(true);
     });
 
     it("deve validar senhas longas", async () => {
       const password = "a".repeat(100);
-      const hash = await BcryptService.hash(password);
+      const hash = await bcryptService.hash(password);
 
-      const result = await BcryptService.compare(password, hash);
+      const result = await bcryptService.compare(password, hash);
 
       expect(result).toBe(true);
     });
@@ -113,9 +118,9 @@ describe("BcryptService", () => {
       ];
 
       for (const password of passwords) {
-        const hash = await BcryptService.hash(password);
-        const isValid = await BcryptService.compare(password, hash);
-        const isInvalid = await BcryptService.compare("wrong", hash);
+        const hash = await bcryptService.hash(password);
+        const isValid = await bcryptService.compare(password, hash);
+        const isInvalid = await bcryptService.compare("wrong", hash);
 
         expect(isValid).toBe(true);
         expect(isInvalid).toBe(false);

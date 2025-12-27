@@ -9,7 +9,9 @@ import {
 import { UnauthorizedException } from "../exceptions";
 
 export class AuthMiddleware {
-  static async execute(
+  constructor(private readonly jwtService: JwtService) {}
+
+  async execute(
     req: Request,
     _res: Response,
     next: NextFunction
@@ -24,7 +26,7 @@ export class AuthMiddleware {
       const token = authHeader.substring(7);
 
       try {
-        const decoded = JwtService.verify(token);
+        const decoded = this.jwtService.verify(token);
         req.user = decoded;
 
         AlsService.set(USER_ID_CONSTANT, decoded.sub);

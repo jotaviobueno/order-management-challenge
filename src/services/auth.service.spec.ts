@@ -11,14 +11,25 @@ vi.mock("../utils/jwt");
 describe("AuthService", () => {
   let authService: AuthService;
   let userRepository: UserRepository;
+  let bcryptService: BcryptService;
+  let jwtService: JwtService;
 
   beforeEach(() => {
     userRepository = {
       getByEmail: vi.fn(),
     } as any;
 
-    authService = new AuthService();
-    (authService as any).userRepository = userRepository;
+    bcryptService = {
+      hash: vi.fn(),
+      compare: vi.fn(),
+    } as any;
+
+    jwtService = {
+      generate: vi.fn(),
+      verify: vi.fn(),
+    } as any;
+
+    authService = new AuthService(userRepository, bcryptService, jwtService);
     vi.clearAllMocks();
   });
 
@@ -38,21 +49,23 @@ describe("AuthService", () => {
       const mockToken = "jwt.token.here";
 
       vi.spyOn(userRepository, "getByEmail").mockResolvedValue(mockUser as any);
-      vi.spyOn(BcryptService, "compare").mockResolvedValue(true);
-      vi.spyOn(JwtService, "generate").mockReturnValue(mockToken);
+      vi.spyOn(bcryptService, "compare").mockResolvedValue(true);
+      vi.spyOn(jwtService, "generate").mockReturnValue(mockToken);
 
       const result = await authService.login(loginData);
 
       expect(userRepository.getByEmail).toHaveBeenCalledWith(loginData.email);
-      expect(BcryptService.compare).toHaveBeenCalledWith(
+      expect(bcryptService.compare).toHaveBeenCalledWith(
         loginData.password,
         mockUser.password
       );
-      expect(JwtService.generate).toHaveBeenCalledWith({
+      expect(jwtService.generate).toHaveBeenCalledWith({
         sub: mockUser._id.toString(),
         email: mockUser.email,
       });
       expect(result.token).toBe(mockToken);
+      expect(result.user.id).toBe(mockUser._id.toString());
+      expect(result.user.email).toBe(mockUser.email);
     });
 
     it("deve lançar UnauthorizedException se usuário não existe", async () => {
@@ -84,7 +97,7 @@ describe("AuthService", () => {
       };
 
       vi.spyOn(userRepository, "getByEmail").mockResolvedValue(mockUser as any);
-      vi.spyOn(BcryptService, "compare").mockResolvedValue(false);
+      vi.spyOn(bcryptService, "compare").mockResolvedValue(false);
 
       await expect(authService.login(loginData)).rejects.toThrow(
         UnauthorizedException
@@ -107,8 +120,8 @@ describe("AuthService", () => {
       };
 
       vi.spyOn(userRepository, "getByEmail").mockResolvedValue(mockUser as any);
-      vi.spyOn(BcryptService, "compare").mockResolvedValue(false);
-      const generateSpy = vi.spyOn(JwtService, "generate");
+      vi.spyOn(bcryptService, "compare").mockResolvedValue(false);
+      const generateSpy = vi.spyOn(jwtService, "generate");
 
       try {
         await authService.login(loginData);

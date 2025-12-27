@@ -3,11 +3,19 @@ import { OrderController } from "../controllers/order.controller";
 import { ValidateMiddleware } from "../middlewares";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { createOrderSchema, listOrdersQuerySchema } from "../dtos/order.dto";
+import { OrderService } from "../services/order.service";
+import { OrderRepository } from "../repositories/order.repository";
+import { JwtService } from "../utils";
 
 const router = Router();
-const orderController = new OrderController();
+const jwtService = new JwtService();
+const orderRepository = new OrderRepository();
+const orderService = new OrderService(orderRepository);
+const orderController = new OrderController(orderService);
 
-router.use(AuthMiddleware.execute);
+const authMiddleware = new AuthMiddleware(jwtService);
+
+router.use(authMiddleware.execute);
 router.post(
   "/",
   ValidateMiddleware.body(createOrderSchema),

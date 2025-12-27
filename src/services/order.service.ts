@@ -9,11 +9,8 @@ import { OrderState } from "@/types";
 
 export class OrderService {
   private readonly logger = new Logger(OrderService.name);
-  private orderRepository: OrderRepository;
 
-  constructor() {
-    this.orderRepository = new OrderRepository();
-  }
+  constructor(private readonly orderRepository: OrderRepository) {}
 
   async create(data: CreateOrderDto): Promise<IOrderResponse> {
     this.logger.log(`Tentando criar pedido para paciente: ${data.patient}`);

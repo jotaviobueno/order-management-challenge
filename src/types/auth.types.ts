@@ -1,3 +1,5 @@
+import { IUserResponse } from "./user.types";
+
 export interface IAuthPayload {
   sub: string;
   email: string;
@@ -9,8 +11,5 @@ export interface ILoginResponse {
 
 export interface IAuthResponse {
   token: string;
-  user: {
-    id: string;
-    email: string;
-  };
+  user: IUserResponse;
 }

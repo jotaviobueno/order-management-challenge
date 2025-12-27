@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { UserService } from "./user.service";
 import { UserRepository } from "../repositories/user.repository";
 import { BcryptService } from "../utils/bcrypt";
+import { JwtService } from "../utils/jwt";
 import { MongoIdValidator } from "../utils/mongo-id.validator";
 import {
   BadRequestException,
@@ -10,11 +11,14 @@ import {
 } from "../exceptions";
 
 vi.mock("../utils/bcrypt");
+vi.mock("../utils/jwt");
 vi.mock("../utils/mongo-id.validator");
 
 describe("UserService", () => {
   let userService: UserService;
   let userRepository: UserRepository;
+  let bcryptService: BcryptService;
+  let jwtService: JwtService;
 
   beforeEach(() => {
     userRepository = {
@@ -25,8 +29,17 @@ describe("UserService", () => {
       softDelete: vi.fn(),
     } as any;
 
-    userService = new UserService();
-    (userService as any).userRepository = userRepository;
+    bcryptService = {
+      hash: vi.fn(),
+      compare: vi.fn(),
+    } as any;
+
+    jwtService = {
+      generate: vi.fn(),
+      verify: vi.fn(),
+    } as any;
+
+    userService = new UserService(userRepository, bcryptService, jwtService);
     vi.clearAllMocks();
   });
 
@@ -45,20 +58,28 @@ describe("UserService", () => {
         updatedAt: new Date(),
       };
 
+      const mockToken = "jwt.token.here";
+
       vi.spyOn(userRepository, "existsByEmail").mockResolvedValue(false);
-      vi.spyOn(BcryptService, "hash").mockResolvedValue(hashedPassword);
+      vi.spyOn(bcryptService, "hash").mockResolvedValue(hashedPassword);
       vi.spyOn(userRepository, "create").mockResolvedValue(mockUser as any);
+      vi.spyOn(jwtService, "generate").mockReturnValue(mockToken);
 
       const result = await userService.create(userData);
 
       expect(userRepository.existsByEmail).toHaveBeenCalledWith(userData.email);
-      expect(BcryptService.hash).toHaveBeenCalledWith(userData.password);
+      expect(bcryptService.hash).toHaveBeenCalledWith(userData.password);
       expect(userRepository.create).toHaveBeenCalledWith({
         ...userData,
         password: hashedPassword,
       });
-      expect(result.email).toBe(userData.email);
-      expect(result.id).toBe(mockUser._id.toString());
+      expect(jwtService.generate).toHaveBeenCalledWith({
+        sub: mockUser._id.toString(),
+        email: mockUser.email,
+      });
+      expect(result.token).toBe(mockToken);
+      expect(result.user.email).toBe(userData.email);
+      expect(result.user.id).toBe(mockUser._id.toString());
     });
 
     it("deve lançar ConflictException se email já existe", async () => {
