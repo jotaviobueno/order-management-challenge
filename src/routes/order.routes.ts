@@ -19,7 +19,7 @@ router.get(
   orderController.findAll
 );
 router.get("/:id", orderController.findById);
-router.put("/:id/advance", orderController.advance);
+router.patch("/:id/advance", orderController.advance);
 router.delete("/:id", orderController.softDelete);
 
 export { router as orderRouter };
