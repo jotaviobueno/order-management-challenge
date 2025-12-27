@@ -1,69 +1,185 @@
-# Desafio Técnico Backend
+# Desafio Técnico Backend - Sistema de Gerenciamento de Pedidos
 
-**Objetivo:** Avaliar organização de código, domínio de TypeScript e implementação de regras de negócio.
-**Stack:** Node.js, Express, Mongoose, TypeScript.
-**Testes:** Vitest (Diferencial).
+Sistema de gerenciamento de pedidos com autenticação JWT, construído com Node.js, Express, MongoDB e TypeScript.
 
-### Estrutura de Dados
+## 🚀 Tecnologias
 
-**1. User**
+- **Node.js** - Ambiente de execução JavaScript
+- **Express** - Framework web
+- **MongoDB** - Banco de dados NoSQL
+- **Mongoose** - ODM para MongoDB
+- **TypeScript** - Superset JavaScript com tipagem estática
+- **Zod** - Validação de schemas
+- **JWT** - Autenticação via tokens
+- **Bcrypt** - Hash de senhas
+- **Vitest** - Framework de testes
 
-* `email` (unique), `password`.
+## 📁 Estrutura do Projeto
 
-**2. Order**
+```
+src/
+├── config/          # Configurações (database, env)
+├── models/          # Schemas do Mongoose
+├── types/           # Tipos e interfaces TypeScript
+├── dtos/            # Data Transfer Objects e validação
+├── middlewares/     # Middlewares (auth, error, validation)
+├── utils/           # Utilitários (JWT)
+├── app.ts           # Configuração do Express
+└── server.ts        # Entrada da aplicação
+```
 
-* Campos: `lab`, `patient`, `customer` (strings).
-* `state`: `CREATED` -> `ANALYSIS` -> `COMPLETED`.
-* `status`: `ACTIVE` | `DELETED`.
-* `services` (Array obrigatório): `{ name: string, value: number, status: 'PENDING' | 'DONE' }`.
+## 🔧 Pré-requisitos
 
----
+- Node.js (v18 ou superior)
+- Docker e Docker Compose
+- npm ou yarn
 
-### ETAPA 1: Essencial (Obrigatório)
+## ⚙️ Instalação
 
-1. **Autenticação:**
-* Registro e Login retornando JWT.
-* Middleware de proteção para rotas de pedidos.
+1. Clone o repositório:
 
+```bash
+git clone <url-do-repositorio>
+cd order-management-challenge
+```
 
-2. **Gestão de Pedidos:**
-* **POST /orders:** Criação do pedido. Padrão: `state: CREATED`, `status: ACTIVE`.
-* **GET /orders:** Listagem com paginação e filtro por `state`.
+2. Instale as dependências:
 
+```bash
+npm install
+```
 
+3. Configure as variáveis de ambiente:
 
----
+```bash
+cp .env.example .env
+```
 
-### ETAPA 2: Diferencial (Regras e Qualidade)
+Edite o arquivo `.env` com suas configurações:
 
-1. **Validação de Negócio:**
-* Não permitir criação de pedidos sem serviços ou com valor total zerado.
+```env
+PORT=3000
+NODE_ENV=development
+MONGODB_URI=mongodb://admin:admin123@localhost:27017/order-management?authSource=admin
+JWT_SECRET=seu-segredo-aqui
+JWT_EXPIRES_IN=7d
+```
 
+4. Inicie o MongoDB com Docker Compose:
 
-2. **Fluxo de Status:**
-* Endpoint `PATCH /orders/:id/advance`.
-* A transição deve respeitar a ordem estrita: `CREATED` -> `ANALYSIS` -> `COMPLETED`.
-* Bloquear tentativas de pular etapas ou retroceder.
+```bash
+# Usando npm scripts (recomendado)
+npm run docker:up
 
+# Ou usando docker-compose diretamente
+docker-compose up -d
+```
 
-3. **Testes (Vitest):**
-* Teste unitário garantindo que a lógica de transição de `state` funciona e bloqueia ações inválidas.
+**Serviços disponíveis:**
 
+- **MongoDB**: `localhost:27017`
+- **Mongo Express** (Interface web): `http://localhost:8081`
+  - Usuário: `admin`
+  - Senha: `admin123`
 
+**Scripts NPM para Docker:**
 
----
+```bash
+npm run docker:up       # Iniciar containers
+npm run docker:down     # Parar containers
+npm run docker:logs     # Ver logs em tempo real
+npm run docker:restart  # Reiniciar containers
+npm run docker:clean    # Parar e remover volumes (apaga dados)
+```
 
-### Critérios de Avaliação
+## 🏃 Execução
 
-* **Arquitetura:** Separação de responsabilidades e clareza.
-* **TypeScript:** Uso correto de tipagem.
-* **Mongoose:** Modelagem e queries eficientes.
-* **Commits:** Histórico e organização no Git.
+### Modo desenvolvimento (com hot reload):
 
----
+```bash
+npm run dev
+```
 
-### 📅 Prazo de Entrega
+### Build para produção:
 
-A data limite para submissão do link do repositório é **04/01**. Envios após essa data não serão considerados. Bom código!"
+```bash
+npm run build
+npm start
+```
 
-**Entrega:** Link do repositório com instruções de execução no README.
+## 🧪 Testes
+
+```bash
+# Executar testes
+npm test
+
+# Executar testes com interface gráfica
+npm run test:ui
+
+# Executar testes com cobertura
+npm run test:coverage
+```
+
+## 📚 Estrutura de Dados
+
+### User
+
+```typescript
+{
+  email: string; // único
+  password: string; // hash bcrypt
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### Order
+
+```typescript
+{
+  lab: string;
+  patient: string;
+  customer: string;
+  state: 'CREATED' | 'ANALYSIS' | 'COMPLETED';
+  status: 'ACTIVE' | 'DELETED';
+  services: [
+    {
+      name: string;
+      value: number;
+      status: 'PENDING' | 'DONE';
+    }
+  ];
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+## 🔐 Autenticação
+
+A API utiliza JWT (JSON Web Token) para autenticação. Após o login, inclua o token no header das requisições:
+
+```
+Authorization: Bearer <seu-token>
+```
+
+## 📝 Regras de Negócio
+
+1. **Validação de Pedidos:**
+
+   - Não é permitido criar pedidos sem serviços
+   - O valor total dos serviços não pode ser zero
+   - Pedidos iniciam com `state: CREATED` e `status: ACTIVE`
+
+2. **Fluxo de Estados:**
+   - Transição válida: `CREATED` → `ANALYSIS` → `COMPLETED`
+   - Não é permitido pular etapas ou retroceder
+
+## 👨‍💻 Desenvolvimento
+
+Este projeto segue boas práticas de desenvolvimento:
+
+- **Arquitetura em camadas** (Models, DTOs, Middlewares)
+- **Tipagem forte** com TypeScript
+- **Validação de dados** com Zod
+- **Tratamento de erros** centralizado
+- **Segurança** com hash de senhas e JWT

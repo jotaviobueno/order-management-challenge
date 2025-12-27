@@ -1,0 +1,12 @@
+// AsyncContext Store Constants
+export const REQUEST_ID_CONSTANT = "requestId";
+export const USER_ID_CONSTANT = "userId";
+export const EMAIL_CONSTANT = "email";
+export const ACCESS_TOKEN_CONSTANT = "accessToken";
+export const USER_AGENT_CONSTANT = "userAgent";
+export const ENDPOINT_CONSTANT = "endpoint";
+export const IP_ADDRESS_CONSTANT = "ipAddress";
+export const X_TRACING_ID_CONSTANT = "xTracingId";
+export const START_TIME_CONSTANT = "startTime";
+export const METHOD_CONSTANT = "method";
+export const PATH_CONSTANT = "path";
