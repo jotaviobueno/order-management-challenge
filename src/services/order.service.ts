@@ -98,12 +98,7 @@ export class OrderService {
       throw new BadRequestException("ID inválido");
     }
 
-    const order = await this.orderRepository.findById(id);
-
-    if (!order) {
-      this.logger.warn(`Pedido não encontrado: ${id}`);
-      throw new NotFoundException("Pedido não encontrado");
-    }
+    const order = await this.findById(id);
 
     const currentState = order.state;
 
