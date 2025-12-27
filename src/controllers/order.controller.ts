@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-import { UserService } from "../services/user.service";
-import { CreateUserDTO, ListUsersQueryDTO } from "../dtos/user.dto";
+import { OrderService } from "../services/order.service";
+import { CreateOrderDTO, ListOrdersQueryDTO } from "../dtos/order.dto";
 import { HttpStatus } from "../exceptions";
 
-export class UserController {
-  private userService: UserService;
+export class OrderController {
+  private orderService: OrderService;
 
   constructor() {
-    this.userService = new UserService();
+    this.orderService = new OrderService();
   }
 
   create = async (
@@ -16,11 +16,11 @@ export class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const data: CreateUserDTO = req.body;
-      const result = await this.userService.create(data);
+      const data: CreateOrderDTO = req.body;
+      const result = await this.orderService.create(data);
 
       res.status(HttpStatus.CREATED).json({
-        message: "Usuário criado com sucesso",
+        message: "Pedido criado com sucesso",
         data: result,
       });
     } catch (error) {
@@ -35,11 +35,10 @@ export class UserController {
   ): Promise<void> => {
     try {
       const { id } = req.params;
-
-      const user = await this.userService.findById(id);
+      const order = await this.orderService.findById(id);
 
       res.status(HttpStatus.OK).json({
-        data: user,
+        data: order,
       });
     } catch (error) {
       next(error);
@@ -52,14 +51,33 @@ export class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const query: ListUsersQueryDTO = {
+      const query: ListOrdersQueryDTO = {
         page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
         limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
+        state: req.query.state as any,
       };
 
-      const result = await this.userService.findAll(query);
+      const result = await this.orderService.findAll(query);
 
       res.status(HttpStatus.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  advance = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const result = await this.orderService.advance(id);
+
+      res.status(HttpStatus.OK).json({
+        message: "Estado do pedido avançado com sucesso",
+        data: result,
+      });
     } catch (error) {
       next(error);
     }
@@ -72,11 +90,10 @@ export class UserController {
   ): Promise<void> => {
     try {
       const { id } = req.params;
-
-      await this.userService.softDelete(id);
+      await this.orderService.softDelete(id);
 
       res.status(HttpStatus.OK).json({
-        message: "Usuário deletado com sucesso",
+        message: "Pedido deletado com sucesso",
       });
     } catch (error) {
       next(error);

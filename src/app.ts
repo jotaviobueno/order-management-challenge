@@ -2,7 +2,7 @@ import express, { Application } from "express";
 import cors from "cors";
 import { ErrorHandler } from "./exceptions";
 import { MetadataMiddleware } from "./middlewares/metadata.middleware";
-import { userRouter, authRouter } from "./routes";
+import { userRouter, authRouter, orderRouter } from "./routes";
 
 export const createApp = (): Application => {
   const app = express();
@@ -18,6 +18,7 @@ export const createApp = (): Application => {
 
   app.use("/auth", authRouter);
   app.use("/user", userRouter);
+  app.use("/order", orderRouter);
 
   app.use(ErrorHandler.execute);
 

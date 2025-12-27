@@ -43,4 +43,3 @@ export const listOrdersQuerySchema = z.object({
 
 export type CreateOrderDTO = z.infer<typeof createOrderSchema>;
 export type ListOrdersQueryDTO = z.infer<typeof listOrdersQuerySchema>;
-export type ServiceDTO = z.infer<typeof serviceSchema>;

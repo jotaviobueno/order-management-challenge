@@ -1,5 +1,5 @@
 import { UserRepository } from "../repositories/user.repository";
-import { CreateUserDTO } from "../dtos/user.dto";
+import { CreateUserDTO, ListUsersQueryDTO } from "../dtos/user.dto";
 import { IUserResponse } from "../types/user.types";
 import { BcryptService } from "../utils/bcrypt";
 import {
@@ -8,8 +8,10 @@ import {
   NotFoundException,
 } from "../exceptions";
 import { MongoIdValidator, Logger } from "@/utils";
+import { PaginatedResult } from "../types/pagination.types";
 
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
   private userRepository: UserRepository;
 
   constructor() {
@@ -17,13 +19,13 @@ export class UserService {
   }
 
   async create(data: CreateUserDTO): Promise<IUserResponse> {
-    Logger.log(`[UserService] Tentando criar usuário: ${data.email}`);
+    this.logger.log(`Tentando criar usuário: ${data.email}`);
 
     const existingUser = await this.userRepository.existsByEmail(data.email);
 
     if (existingUser) {
-      Logger.warn(
-        `[UserService] Tentativa de criar usuário com email duplicado: ${data.email}`
+      this.logger.warn(
+        `Tentativa de criar usuário com email duplicado: ${data.email}`
       );
       throw new ConflictException("Email já cadastrado");
     }
@@ -35,55 +37,66 @@ export class UserService {
       password: hashedPassword,
     });
 
-    Logger.log(
-      `[UserService] Usuário criado com sucesso: ${user._id} - ${data.email}`
-    );
+    this.logger.log(`Usuário criado com sucesso: ${user._id} - ${data.email}`);
     return this.formatUserResponse(user);
   }
 
   async findById(id: string): Promise<IUserResponse> {
-    Logger.debug(`[UserService] Buscando usuário por ID: ${id}`);
+    this.logger.debug(`Buscando usuário por ID: ${id}`);
 
     const isMongoId = MongoIdValidator.isValid(id);
 
     if (!isMongoId) {
-      Logger.warn(`[UserService] ID inválido fornecido: ${id}`);
+      this.logger.warn(`ID inválido fornecido: ${id}`);
       throw new BadRequestException("ID inválido");
     }
 
     const user = await this.userRepository.getById(id);
 
     if (!user) {
-      Logger.warn(`[UserService] Usuário não encontrado: ${id}`);
+      this.logger.warn(`Usuário não encontrado: ${id}`);
       throw new NotFoundException("Usuário não encontrado");
     }
 
-    Logger.debug(`[UserService] Usuário encontrado: ${id}`);
+    this.logger.debug(`Usuário encontrado: ${id}`);
     return this.formatUserResponse(user);
   }
 
-  async findAll(): Promise<IUserResponse[]> {
-    Logger.debug(`[UserService] Buscando todos os usuários`);
+  async findAll(
+    query: ListUsersQueryDTO
+  ): Promise<PaginatedResult<IUserResponse>> {
+    this.logger.debug(
+      `Buscando usuários - Página: ${query.page}, Limite: ${query.limit}`
+    );
 
-    const users = await this.userRepository.findAll();
+    const result = await this.userRepository.findAll({
+      page: query.page,
+      limit: query.limit,
+    });
 
-    Logger.log(`[UserService] ${users.length} usuário(s) encontrado(s)`);
-    return users.map(this.formatUserResponse);
+    this.logger.log(
+      `${result.data.length} usuário(s) encontrado(s) na página ${query.page}`
+    );
+
+    return {
+      data: result.data.map(this.formatUserResponse),
+      pagination: result.pagination,
+    };
   }
 
   async softDelete(id: string): Promise<void> {
-    Logger.log(`[UserService] Tentando deletar usuário: ${id}`);
+    this.logger.log(`Tentando deletar usuário: ${id}`);
 
     const user = await this.findById(id);
 
     const update = await this.userRepository.softDelete(user.id);
 
     if (!update) {
-      Logger.error(`[UserService] Falha ao deletar usuário: ${id}`);
+      this.logger.error(`Falha ao deletar usuário: ${id}`);
       throw new NotFoundException("Usuário não encontrado");
     }
 
-    Logger.log(`[UserService] Usuário deletado com sucesso: ${id}`);
+    this.logger.log(`Usuário deletado com sucesso: ${id}`);
   }
 
   private formatUserResponse(user: any): IUserResponse {
