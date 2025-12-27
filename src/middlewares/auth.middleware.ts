@@ -6,19 +6,19 @@ import {
   EMAIL_CONSTANT,
   ACCESS_TOKEN_CONSTANT,
 } from "@/config";
+import { UnauthorizedException } from "../exceptions";
 
 export class AuthMiddleware {
   static async execute(
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
       const authHeader = req.headers.authorization;
 
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        res.status(401).json({ error: "Token não fornecido" });
-        return;
+        throw new UnauthorizedException("Token não fornecido");
       }
 
       const token = authHeader.substring(7);
@@ -36,12 +36,10 @@ export class AuthMiddleware {
 
         next();
       } catch (error) {
-        res.status(401).json({ error: "Token inválido ou expirado" });
-        return;
+        throw new UnauthorizedException("Token inválido ou expirado");
       }
     } catch (error) {
-      res.status(500).json({ error: "Erro na autenticação" });
-      return;
+      next(error);
     }
   }
 }

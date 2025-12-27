@@ -3,6 +3,10 @@ export interface IAuthPayload {
   email: string;
 }
 
+export interface ILoginResponse {
+  token: string;
+}
+
 export interface IAuthResponse {
   token: string;
   user: {

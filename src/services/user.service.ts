@@ -2,6 +2,7 @@ import { UserRepository } from "../repositories/user.repository";
 import { CreateUserDTO } from "../dtos/user.dto";
 import { IUserResponse } from "../types/user.types";
 import { BcryptService } from "../utils/bcrypt";
+import { ConflictException, NotFoundException } from "../exceptions";
 
 export class UserService {
   private userRepository: UserRepository;
@@ -14,7 +15,7 @@ export class UserService {
     const existingUser = await this.userRepository.existsByEmail(data.email);
 
     if (existingUser) {
-      throw new Error("Email já cadastrado");
+      throw new ConflictException("Email já cadastrado");
     }
 
     const hashedPassword = await BcryptService.hash(data.password);
@@ -31,7 +32,7 @@ export class UserService {
     const user = await this.userRepository.getById(id);
 
     if (!user) {
-      throw new Error("Usuário não encontrado");
+      throw new NotFoundException("Usuário não encontrado");
     }
 
     return this.formatUserResponse(user);
@@ -46,7 +47,7 @@ export class UserService {
     const user = await this.userRepository.softDelete(id);
 
     if (!user) {
-      throw new Error("Usuário não encontrado");
+      throw new NotFoundException("Usuário não encontrado");
     }
   }
 

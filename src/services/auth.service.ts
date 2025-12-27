@@ -3,6 +3,8 @@ import { LoginUserDTO } from "../dtos/auth.dto";
 import { IUserResponse } from "../types/user.types";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
+import { UnauthorizedException } from "../exceptions";
+import { ILoginResponse } from "@/types";
 
 export class AuthService {
   private userRepository: UserRepository;
@@ -11,13 +13,11 @@ export class AuthService {
     this.userRepository = new UserRepository();
   }
 
-  async login(
-    data: LoginUserDTO
-  ): Promise<{ user: IUserResponse; token: string }> {
+  async login(data: LoginUserDTO): Promise<ILoginResponse> {
     const user = await this.userRepository.getByEmail(data.email);
 
     if (!user) {
-      throw new Error("Credenciais inválidas");
+      throw new UnauthorizedException("Credenciais inválidas");
     }
 
     const isPasswordValid = await BcryptService.compare(
@@ -26,7 +26,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new Error("Credenciais inválidas");
+      throw new UnauthorizedException("Credenciais inválidas");
     }
 
     const token = JwtService.generate({
@@ -35,17 +35,7 @@ export class AuthService {
     });
 
     return {
-      user: this.formatUserResponse(user),
       token,
-    };
-  }
-
-  private formatUserResponse(user: any): IUserResponse {
-    return {
-      id: user._id.toString(),
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
     };
   }
 }
