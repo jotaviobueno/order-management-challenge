@@ -1,4 +1,3 @@
-import { UserRepository } from "../repositories/user.repository";
 import { LoginUserDto } from "../dtos/auth.dto";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
@@ -6,24 +5,20 @@ import { UnauthorizedException } from "../exceptions";
 import { IAuthResponse } from "@/types";
 import { Logger } from "@/utils";
 import { UserAdapter } from "../adapters";
+import { UserService } from "./user.service";
 
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly userService: UserService,
     private readonly bcryptService: BcryptService,
     private readonly jwtService: JwtService,
     private readonly userAdapter: UserAdapter
   ) {}
 
   async login(data: LoginUserDto): Promise<IAuthResponse> {
-    const user = await this.userRepository.getByEmail(data.email);
-
-    if (!user) {
-      this.logger.warn(`Tentativa de login com email inválido: ${data.email}`);
-      throw new UnauthorizedException("Credenciais inválidas");
-    }
+    const user = await this.userService.findByEmail(data.email);
 
     const isPasswordValid = await this.bcryptService.compare(
       data.password,

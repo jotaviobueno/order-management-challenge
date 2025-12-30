@@ -26,6 +26,7 @@ describe("UserService", () => {
       existsByEmail: vi.fn(),
       create: vi.fn(),
       getById: vi.fn(),
+      getByEmail: vi.fn(),
       findAll: vi.fn(),
       softDelete: vi.fn(),
     } as any;
@@ -120,6 +121,38 @@ describe("UserService", () => {
       } catch (error) {}
 
       expect(createSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("findByEmail", () => {
+    it("deve buscar usuário por email válido", async () => {
+      const email = "test@test.com";
+      const mockUser = {
+        _id: "507f1f77bcf86cd799439011",
+        email: "test@test.com",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      vi.spyOn(userRepository, "getByEmail").mockResolvedValue(mockUser as any);
+
+      const result = await userService.findByEmail(email);
+
+      expect(userRepository.getByEmail).toHaveBeenCalledWith(email);
+      expect(result.email).toBe(mockUser.email);
+    });
+
+    it("deve lançar NotFoundException se usuário não existe", async () => {
+      const email = "test@test.com";
+
+      vi.spyOn(userRepository, "getByEmail").mockResolvedValue(null);
+
+      await expect(userService.findByEmail(email)).rejects.toThrow(
+        NotFoundException
+      );
+      await expect(userService.findByEmail(email)).rejects.toThrow(
+        "Usuário não encontrado"
+      );
     });
   });
 

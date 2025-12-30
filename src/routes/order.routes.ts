@@ -4,7 +4,7 @@ import { createOrderSchema, listOrdersQuerySchema } from "../dtos/order.dto";
 import { orderController, authMiddleware } from "../container";
 
 const router = Router();
-router.use(authMiddleware.execute);
+router.use((req, res, next) => authMiddleware.execute(req, res, next));
 router.post(
   "/",
   ValidateMiddleware.body(createOrderSchema),

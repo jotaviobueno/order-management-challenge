@@ -32,14 +32,14 @@ const userAdapter = new UserAdapter();
 const orderAdapter = new OrderAdapter();
 
 // Services with dependencies
-const authService = new AuthService(
+const userService = new UserService(
   userRepository,
   bcryptService,
   jwtService,
   userAdapter
 );
-const userService = new UserService(
-  userRepository,
+const authService = new AuthService(
+  userService,
   bcryptService,
   jwtService,
   userAdapter

@@ -1,6 +1,6 @@
 import { UserRepository } from "../repositories/user.repository";
 import { CreateUserDto, ListUsersQueryDto } from "../dtos/user.dto";
-import { IUserResponse } from "../types/user.types";
+import { IUser, IUserResponse } from "../types/user.types";
 import { IAuthResponse } from "../types/auth.types";
 import {
   BadRequestException,
@@ -53,6 +53,20 @@ export class UserService {
       token,
       user: this.userAdapter.toResponse(user),
     };
+  }
+
+  async findByEmail(email: string): Promise<IUser> {
+    this.logger.debug(`Buscando usuário por email: ${email}`);
+
+    const user = await this.userRepository.getByEmail(email);
+
+    if (!user) {
+      this.logger.warn(`Usuário não encontrado: ${email}`);
+      throw new NotFoundException("Usuário não encontrado");
+    }
+
+    this.logger.debug(`Usuário encontrado: ${email}`);
+    return user;
   }
 
   async findById(id: string): Promise<IUserResponse> {
