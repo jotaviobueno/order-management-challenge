@@ -6,6 +6,28 @@
 
 Sistema completo de gerenciamento de pedidos laboratoriais com autenticação JWT, validação robusta e arquitetura em camadas.
 
+## 🌐 Acesso à Aplicação
+
+### Produção
+🚀 **API em Produção:** http://z80ccg8g8cc4wc4w00gw844k.31.97.253.3.sslip.io
+
+A aplicação está disponível para testes em ambiente de produção. Utilize esta URL base para fazer requisições aos endpoints documentados neste README.
+
+**Exemplo de uso:**
+```bash
+# Registrar usuário
+curl -X POST http://z80ccg8g8cc4wc4w00gw844k.31.97.253.3.sslip.io/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"senha123"}'
+
+# Login
+curl -X POST http://z80ccg8g8cc4wc4w00gw844k.31.97.253.3.sslip.io/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"senha123"}'
+```
+
+---
+
 ## 🚀 Tecnologias Utilizadas
 
 ### Backend
@@ -318,6 +340,8 @@ enum ServiceStatus {
 
 ## 🛠️ API Endpoints
 
+**Base URL Produção:** `http://z80ccg8g8cc4wc4w00gw844k.31.97.253.3.sslip.io`
+
 ### Autenticação
 
 #### POST /auth/register
@@ -531,6 +555,12 @@ Authorization: Bearer <seu-token>
 
 ## 🚀 Deploy
 
+### Produção Ativa
+
+A aplicação está deployada e disponível em:
+- **URL:** http://z80ccg8g8cc4wc4w00gw844k.31.97.253.3.sslip.io
+- **Status:** ✅ Online e operacional
+
 ### Variáveis de Ambiente Produção
 
 ```env
@@ -546,10 +576,10 @@ LOG_LEVEL=info
 
 ```bash
 # Build para produção
-npm run build
+npm run build:prod
 
 # Executar
-npm start
+npm run start:prod
 
 # Ou com Docker (recomendado)
 docker build -t order-management .
@@ -574,9 +604,11 @@ docker run -p 3000:3000 --env-file .env order-management
 ✅ **Testes**: Cobertura completa com Vitest (diferencial)  
 ✅ **Regras de Negócio**: Implementação robusta de todas as validações  
 ✅ **Segurança**: Autenticação JWT e validação de inputs  
-✅ **Qualidade**: Código limpo, documentado e production-ready
+✅ **Qualidade**: Código limpo, documentado e production-ready  
+✅ **Deploy**: Aplicação em produção e disponível para testes
 
 ---
 
 **📅 Prazo de Entrega:** 04/01  
-**🔗 Repositório:** Link com instruções completas no README
+**🔗 API Produção:** http://z80ccg8g8cc4wc4w00gw844k.31.97.253.3.sslip.io  
+**📖 Repositório:** Link com instruções completas no README
