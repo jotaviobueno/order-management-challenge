@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { OrderStateMachine } from "./order-state-machine";
 import { OrderState } from "../types/enums";
-import { BadRequestException } from "../exceptions";
+import { HttpException } from "../exceptions";
 
 describe("OrderStateMachine", () => {
   describe("canTransition", () => {
@@ -65,8 +65,8 @@ describe("OrderStateMachine", () => {
       expect(nextState).toBe(OrderState.COMPLETED);
     });
 
-    it("deve lançar BadRequestException ao tentar avançar de COMPLETED", () => {
-      expect(() => OrderStateMachine.advance(OrderState.COMPLETED)).toThrow(BadRequestException);
+    it("deve lançar HttpException ao tentar avançar de COMPLETED", () => {
+      expect(() => OrderStateMachine.advance(OrderState.COMPLETED)).toThrow(HttpException);
       expect(() => OrderStateMachine.advance(OrderState.COMPLETED)).toThrow(
         "Pedido já está completo e não pode avançar mais"
       );
@@ -86,28 +86,28 @@ describe("OrderStateMachine", () => {
       ).not.toThrow();
     });
 
-    it("deve lançar BadRequestException para transição inválida de CREATED para COMPLETED", () => {
+    it("deve lançar HttpException para transição inválida de CREATED para COMPLETED", () => {
       expect(() =>
         OrderStateMachine.validateTransition(OrderState.CREATED, OrderState.COMPLETED)
-      ).toThrow(BadRequestException);
+      ).toThrow(HttpException);
       expect(() =>
         OrderStateMachine.validateTransition(OrderState.CREATED, OrderState.COMPLETED)
       ).toThrow("Transição inválida de CREATED para COMPLETED. Transições permitidas: ANALYSIS");
     });
 
-    it("deve lançar BadRequestException para transição inválida de COMPLETED", () => {
+    it("deve lançar HttpException para transição inválida de COMPLETED", () => {
       expect(() =>
         OrderStateMachine.validateTransition(OrderState.COMPLETED, OrderState.CREATED)
-      ).toThrow(BadRequestException);
+      ).toThrow(HttpException);
       expect(() =>
         OrderStateMachine.validateTransition(OrderState.COMPLETED, OrderState.CREATED)
       ).toThrow("Transição inválida de COMPLETED para CREATED. Transições permitidas: nenhuma");
     });
 
-    it("deve lançar BadRequestException para transição para o mesmo estado", () => {
+    it("deve lançar HttpException para transição para o mesmo estado", () => {
       expect(() =>
         OrderStateMachine.validateTransition(OrderState.CREATED, OrderState.CREATED)
-      ).toThrow(BadRequestException);
+      ).toThrow(HttpException);
       expect(() =>
         OrderStateMachine.validateTransition(OrderState.CREATED, OrderState.CREATED)
       ).toThrow("Transição inválida de CREATED para CREATED. Transições permitidas: ANALYSIS");

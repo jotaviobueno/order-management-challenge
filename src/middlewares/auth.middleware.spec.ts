@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { Request, Response } from "express";
 import { AuthMiddleware } from "./auth.middleware";
 import { AlsService } from "../utils/async-context";
-import { UnauthorizedException } from "../exceptions";
+import { HttpException } from "../exceptions";
 
 vi.mock("../utils/jwt");
 vi.mock("../utils/async-context");
@@ -56,18 +56,18 @@ describe("AuthMiddleware", () => {
       expect(mockNext).toHaveBeenCalledWith();
     });
 
-    it("deve lançar UnauthorizedException se authorization header não existir", async () => {
+    it("deve lançar HttpException se authorization header não existir", async () => {
       mockRequest.headers = {};
 
       await authMiddleware.execute(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
       const error = (mockNext as any).mock.calls[0][0];
-      expect(error).toBeInstanceOf(UnauthorizedException);
+      expect(error).toBeInstanceOf(HttpException);
       expect(error.message).toBe("Token não fornecido");
     });
 
-    it("deve lançar UnauthorizedException se authorization header não começar com Bearer", async () => {
+    it("deve lançar HttpException se authorization header não começar com Bearer", async () => {
       mockRequest.headers = {
         authorization: "InvalidFormat token",
       };
@@ -76,11 +76,11 @@ describe("AuthMiddleware", () => {
 
       expect(mockNext).toHaveBeenCalled();
       const error = (mockNext as any).mock.calls[0][0];
-      expect(error).toBeInstanceOf(UnauthorizedException);
+      expect(error).toBeInstanceOf(HttpException);
       expect(error.message).toBe("Token não fornecido");
     });
 
-    it("deve lançar UnauthorizedException se token for inválido", async () => {
+    it("deve lançar HttpException se token for inválido", async () => {
       mockRequest.headers = {
         authorization: "Bearer invalid.token",
       };
@@ -93,11 +93,11 @@ describe("AuthMiddleware", () => {
 
       expect(mockNext).toHaveBeenCalled();
       const error = (mockNext as any).mock.calls[0][0];
-      expect(error).toBeInstanceOf(UnauthorizedException);
+      expect(error).toBeInstanceOf(HttpException);
       expect(error.message).toBe("Token inválido ou expirado");
     });
 
-    it("deve lançar UnauthorizedException se token estiver expirado", async () => {
+    it("deve lançar HttpException se token estiver expirado", async () => {
       mockRequest.headers = {
         authorization: "Bearer expired.token",
       };
@@ -112,7 +112,7 @@ describe("AuthMiddleware", () => {
 
       expect(mockNext).toHaveBeenCalled();
       const error = (mockNext as any).mock.calls[0][0];
-      expect(error).toBeInstanceOf(UnauthorizedException);
+      expect(error).toBeInstanceOf(HttpException);
       expect(error.message).toBe("Token inválido ou expirado");
     });
 

@@ -1,7 +1,7 @@
 import { LoginUserDto } from "../dtos/auth.dto";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
-import { UnauthorizedException } from "../exceptions";
+import { HttpException, HttpStatus } from "../exceptions";
 import { IAuthResponse } from "@/types";
 import { Logger } from "@/utils";
 import { UserAdapter } from "../adapters";
@@ -24,7 +24,7 @@ export class AuthService {
 
     if (!isPasswordValid) {
       this.logger.warn(`Tentativa de login com senha inválida: ${data.email}`);
-      throw new UnauthorizedException("Credenciais inválidas");
+      throw new HttpException("Credenciais inválidas", HttpStatus.BAD_REQUEST);
     }
 
     const token = this.jwtService.generate({

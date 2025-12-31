@@ -2,7 +2,7 @@ import { UserRepository } from "../repositories/user.repository";
 import { CreateUserDto, ListUsersQueryDto } from "../dtos/user.dto";
 import { IUser, IUserResponse } from "../types/user.types";
 import { IAuthResponse } from "../types/auth.types";
-import { BadRequestException, ConflictException, NotFoundException } from "../exceptions";
+import { HttpException, HttpStatus } from "../exceptions";
 import { MongoIdValidator, Logger } from "@/utils";
 import { PaginatedResult } from "../types/pagination.types";
 import { BcryptService } from "../utils/bcrypt";
@@ -26,7 +26,7 @@ export class UserService {
 
     if (existingUser) {
       this.logger.warn(`Tentativa de criar usuário com email duplicado: ${data.email}`);
-      throw new ConflictException("Email já cadastrado");
+      throw new HttpException("Email já cadastrado", HttpStatus.CONFLICT);
     }
 
     const hashedPassword = await this.bcryptService.hash(data.password);
@@ -56,7 +56,7 @@ export class UserService {
 
     if (!user) {
       this.logger.warn(`Usuário não encontrado: ${email}`);
-      throw new NotFoundException("Usuário não encontrado");
+      throw new HttpException("Usuário não encontrado", HttpStatus.NOT_FOUND);
     }
 
     this.logger.debug(`Usuário encontrado: ${email}`);
@@ -70,14 +70,14 @@ export class UserService {
 
     if (!isMongoId) {
       this.logger.warn(`ID inválido fornecido: ${id}`);
-      throw new BadRequestException("ID inválido");
+      throw new HttpException("ID inválido", HttpStatus.BAD_REQUEST);
     }
 
     const user = await this.userRepository.getById(id);
 
     if (!user) {
       this.logger.warn(`Usuário não encontrado: ${id}`);
-      throw new NotFoundException("Usuário não encontrado");
+      throw new HttpException("Usuário não encontrado", HttpStatus.NOT_FOUND);
     }
 
     this.logger.debug(`Usuário encontrado: ${id}`);
@@ -109,7 +109,7 @@ export class UserService {
 
     if (!update) {
       this.logger.error(`Falha ao deletar usuário: ${id}`);
-      throw new NotFoundException("Usuário não encontrado");
+      throw new HttpException("Usuário não encontrado", HttpStatus.NOT_FOUND);
     }
 
     this.logger.log(`Usuário deletado com sucesso: ${id}`);

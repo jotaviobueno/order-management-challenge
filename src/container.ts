@@ -15,33 +15,26 @@ import { AlsService } from "./utils/async-context";
 import { MetadataMiddleware } from "./middlewares";
 import { ErrorHandler } from "./exceptions";
 
-// Utils
 const alsService = new AlsService();
 const errorHandler = new ErrorHandler();
 
-// Repositories
 const userRepository = new UserRepository();
 const orderRepository = new OrderRepository();
 
-// Services
 const bcryptService = new BcryptService();
 const jwtService = new JwtService();
 
-// Adapters
 const userAdapter = new UserAdapter();
 const orderAdapter = new OrderAdapter();
 
-// Services with dependencies
 const userService = new UserService(userRepository, bcryptService, jwtService, userAdapter);
 const authService = new AuthService(userService, bcryptService, jwtService, userAdapter);
 const orderService = new OrderService(orderRepository, orderAdapter);
 
-// Controllers
 const authController = new AuthController(authService);
 const userController = new UserController(userService);
 const orderController = new OrderController(orderService);
 
-// Middlewares
 const authMiddleware = new AuthMiddleware(jwtService);
 const metadataMiddleware = new MetadataMiddleware();
 

@@ -4,8 +4,8 @@ import { UserRepository } from "../repositories/user.repository";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
 import { MongoIdValidator } from "../utils/mongo-id.validator";
-import { BadRequestException, ConflictException, NotFoundException } from "../exceptions";
 import { UserAdapter } from "../adapters";
+import { HttpException } from "../exceptions";
 
 vi.mock("../utils/bcrypt");
 vi.mock("../utils/jwt");
@@ -82,7 +82,7 @@ describe("UserService", () => {
       expect(result.user.id).toBe(mockUser._id.toString());
     });
 
-    it("deve lançar ConflictException se email já existe", async () => {
+    it("deve lançar HttpException se email já existe", async () => {
       const userData = {
         email: "existing@test.com",
         password: "password123",
@@ -90,7 +90,7 @@ describe("UserService", () => {
 
       vi.spyOn(userRepository, "existsByEmail").mockResolvedValue(true);
 
-      await expect(userService.create(userData)).rejects.toThrow(ConflictException);
+      await expect(userService.create(userData)).rejects.toThrow(HttpException);
       await expect(userService.create(userData)).rejects.toThrow("Email já cadastrado");
     });
 
@@ -129,12 +129,12 @@ describe("UserService", () => {
       expect(result.email).toBe(mockUser.email);
     });
 
-    it("deve lançar NotFoundException se usuário não existe", async () => {
+    it("deve lançar HttpException se usuário não existe", async () => {
       const email = "test@test.com";
 
       vi.spyOn(userRepository, "getByEmail").mockResolvedValue(null);
 
-      await expect(userService.findByEmail(email)).rejects.toThrow(NotFoundException);
+      await expect(userService.findByEmail(email)).rejects.toThrow(HttpException);
       await expect(userService.findByEmail(email)).rejects.toThrow("Usuário não encontrado");
     });
   });
@@ -160,22 +160,22 @@ describe("UserService", () => {
       expect(result.email).toBe(mockUser.email);
     });
 
-    it("deve lançar BadRequestException se ID for inválido", async () => {
+    it("deve lançar HttpException se ID for inválido", async () => {
       const invalidId = "invalid-id";
 
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(false);
 
-      await expect(userService.findById(invalidId)).rejects.toThrow(BadRequestException);
+      await expect(userService.findById(invalidId)).rejects.toThrow(HttpException);
       await expect(userService.findById(invalidId)).rejects.toThrow("ID inválido");
     });
 
-    it("deve lançar NotFoundException se usuário não existe", async () => {
+    it("deve lançar HttpException se usuário não existe", async () => {
       const id = "507f1f77bcf86cd799439011";
 
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(true);
       vi.spyOn(userRepository, "getById").mockResolvedValue(null);
 
-      await expect(userService.findById(id)).rejects.toThrow(NotFoundException);
+      await expect(userService.findById(id)).rejects.toThrow(HttpException);
       await expect(userService.findById(id)).rejects.toThrow("Usuário não encontrado");
     });
   });
@@ -262,16 +262,16 @@ describe("UserService", () => {
       expect(userRepository.softDelete).toHaveBeenCalledWith(id);
     });
 
-    it("deve lançar NotFoundException se usuário não existe", async () => {
+    it("deve lançar HttpException se usuário não existe", async () => {
       const id = "507f1f77bcf86cd799439011";
 
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(true);
       vi.spyOn(userRepository, "getById").mockResolvedValue(null);
 
-      await expect(userService.softDelete(id)).rejects.toThrow(NotFoundException);
+      await expect(userService.softDelete(id)).rejects.toThrow(HttpException);
     });
 
-    it("deve lançar NotFoundException se soft delete falhar", async () => {
+    it("deve lançar HttpException se soft delete falhar", async () => {
       const id = "507f1f77bcf86cd799439011";
       const mockUser = {
         _id: id,
@@ -284,7 +284,7 @@ describe("UserService", () => {
       vi.spyOn(userRepository, "getById").mockResolvedValue(mockUser as any);
       vi.spyOn(userRepository, "softDelete").mockResolvedValue(null);
 
-      await expect(userService.softDelete(id)).rejects.toThrow(NotFoundException);
+      await expect(userService.softDelete(id)).rejects.toThrow(HttpException);
       await expect(userService.softDelete(id)).rejects.toThrow("Usuário não encontrado");
     });
   });

@@ -2,7 +2,7 @@ import { OrderRepository } from "../repositories/order.repository";
 import { PaginatedResult } from "../types/pagination.types";
 import { CreateOrderDto, ListOrdersQueryDto } from "../dtos/order.dto";
 import { IOrderResponse } from "../types/order.types";
-import { BadRequestException, NotFoundException } from "../exceptions";
+import { HttpException, HttpStatus } from "../exceptions";
 import { MongoIdValidator, Logger } from "@/utils";
 import { OrderStateMachine } from "../utils/order-state-machine";
 import { OrderState } from "@/types";
@@ -23,12 +23,15 @@ export class OrderService {
 
     if (totalValue <= 0) {
       this.logger.warn(`Tentativa de criar pedido com valor total zerado`);
-      throw new BadRequestException("O valor total dos serviços deve ser maior que zero");
+      throw new HttpException(
+        "O valor total dos serviços deve ser maior que zero",
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     if (!data.services || data.services.length === 0) {
       this.logger.warn(`Tentativa de criar pedido sem serviços`);
-      throw new BadRequestException("Pelo menos um serviço é obrigatório");
+      throw new HttpException("Pelo menos um serviço é obrigatório", HttpStatus.BAD_REQUEST);
     }
 
     const order = await this.orderRepository.create(data);
@@ -43,14 +46,14 @@ export class OrderService {
     const isMongoId = MongoIdValidator.isValid(id);
     if (!isMongoId) {
       this.logger.warn(`ID inválido fornecido: ${id}`);
-      throw new BadRequestException("ID inválido");
+      throw new HttpException("ID inválido", HttpStatus.BAD_REQUEST);
     }
 
     const order = await this.orderRepository.findById(id);
 
     if (!order) {
       this.logger.warn(`Pedido não encontrado: ${id}`);
-      throw new NotFoundException("Pedido não encontrado");
+      throw new HttpException("Pedido não encontrado", HttpStatus.NOT_FOUND);
     }
 
     this.logger.debug(`Pedido encontrado: ${id}`);
@@ -84,7 +87,7 @@ export class OrderService {
     const isMongoId = MongoIdValidator.isValid(id);
     if (!isMongoId) {
       this.logger.warn(`ID inválido fornecido: ${id}`);
-      throw new BadRequestException("ID inválido");
+      throw new HttpException("ID inválido", HttpStatus.BAD_REQUEST);
     }
 
     const order = await this.findById(id);
@@ -95,23 +98,26 @@ export class OrderService {
       this.logger.warn(
         `Tentativa de avançar pedido em estado final: ${id} - Estado: ${currentState}`
       );
-      throw new BadRequestException(`Pedido já está no estado final: ${currentState}`);
+      throw new HttpException(
+        `Pedido já está no estado final: ${currentState}`,
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     const nextState = OrderStateMachine.advance(currentState);
 
     this.logger.log(`Avançando pedido ${id} de ${currentState} para ${nextState}`);
 
-    const updatedOrder = await this.orderRepository.updateState(id, nextState);
+    const update = await this.orderRepository.updateState(id, nextState);
 
-    if (!updatedOrder) {
+    if (!update) {
       this.logger.error(`Falha ao atualizar estado do pedido: ${id}`);
-      throw new NotFoundException("Falha ao atualizar pedido");
+      throw new HttpException("Falha ao atualizar pedido", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     this.logger.log(`Pedido ${id} avançado com sucesso para ${nextState}`);
 
-    return this.orderAdapter.toResponse(updatedOrder);
+    return this.orderAdapter.toResponse(update);
   }
 
   async softDelete(id: string): Promise<void> {
@@ -121,14 +127,17 @@ export class OrderService {
 
     if (order.state === OrderState.COMPLETED) {
       this.logger.warn(`Tentativa de exclusão de pedido já concluído: ${id}`);
-      throw new BadRequestException("Não é possível excluir um pedido já concluído");
+      throw new HttpException(
+        "Não é possível excluir um pedido já concluído",
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     const update = await this.orderRepository.softDelete(order.id);
 
     if (!update) {
       this.logger.error(`Falha ao deletar pedido: ${id}`);
-      throw new NotFoundException("Falha ao deletar pedido");
+      throw new HttpException("Falha ao deletar pedido", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     this.logger.log(`Pedido deletado com sucesso: ${id}`);

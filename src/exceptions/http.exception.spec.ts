@@ -1,14 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { HttpException } from "./http.exception";
 import { HttpStatus } from "./http-status.enum";
-import {
-  BadRequestException,
-  UnauthorizedException,
-  ForbiddenException,
-  NotFoundException,
-  ConflictException,
-  InternalServerErrorException,
-} from "./index";
 
 describe("HttpException", () => {
   describe("base HttpException", () => {
@@ -41,106 +33,59 @@ describe("HttpException", () => {
     });
   });
 
-  describe("BadRequestException", () => {
-    it("deve criar exceção com status 400", () => {
-      const exception = new BadRequestException("Invalid input");
+  describe("diferentes status codes", () => {
+    it("deve criar exceção com status 400 (BAD_REQUEST)", () => {
+      const exception = new HttpException("Invalid input", HttpStatus.BAD_REQUEST);
 
       expect(exception.message).toBe("Invalid input");
       expect(exception.statusCode).toBe(HttpStatus.BAD_REQUEST);
       expect(exception).toBeInstanceOf(HttpException);
     });
 
-    it("deve suportar details", () => {
-      const details = { field: "age", min: 18 };
-      const exception = new BadRequestException("Validation failed", details);
-
-      expect(exception.details).toEqual(details);
-    });
-  });
-
-  describe("UnauthorizedException", () => {
-    it("deve criar exceção com status 401", () => {
-      const exception = new UnauthorizedException("Not authenticated");
+    it("deve criar exceção com status 401 (UNAUTHORIZED)", () => {
+      const exception = new HttpException("Not authenticated", HttpStatus.UNAUTHORIZED);
 
       expect(exception.message).toBe("Not authenticated");
       expect(exception.statusCode).toBe(HttpStatus.UNAUTHORIZED);
       expect(exception).toBeInstanceOf(HttpException);
     });
 
-    it("deve usar mensagem padrão se não fornecida", () => {
-      const exception = new UnauthorizedException();
-
-      expect(exception.message).toBe("Unauthorized");
-    });
-  });
-
-  describe("ForbiddenException", () => {
-    it("deve criar exceção com status 403", () => {
-      const exception = new ForbiddenException("Access denied");
+    it("deve criar exceção com status 403 (FORBIDDEN)", () => {
+      const exception = new HttpException("Access denied", HttpStatus.FORBIDDEN);
 
       expect(exception.message).toBe("Access denied");
       expect(exception.statusCode).toBe(HttpStatus.FORBIDDEN);
       expect(exception).toBeInstanceOf(HttpException);
     });
 
-    it("deve usar mensagem padrão se não fornecida", () => {
-      const exception = new ForbiddenException();
-
-      expect(exception.message).toBe("Forbidden");
-    });
-  });
-
-  describe("NotFoundException", () => {
-    it("deve criar exceção com status 404", () => {
-      const exception = new NotFoundException("Resource not found");
+    it("deve criar exceção com status 404 (NOT_FOUND)", () => {
+      const exception = new HttpException("Resource not found", HttpStatus.NOT_FOUND);
 
       expect(exception.message).toBe("Resource not found");
       expect(exception.statusCode).toBe(HttpStatus.NOT_FOUND);
       expect(exception).toBeInstanceOf(HttpException);
     });
 
-    it("deve usar mensagem padrão se não fornecida", () => {
-      const exception = new NotFoundException();
-
-      expect(exception.message).toBe("Not Found");
-    });
-  });
-
-  describe("ConflictException", () => {
-    it("deve criar exceção com status 409", () => {
-      const exception = new ConflictException("Resource already exists");
+    it("deve criar exceção com status 409 (CONFLICT)", () => {
+      const exception = new HttpException("Resource already exists", HttpStatus.CONFLICT);
 
       expect(exception.message).toBe("Resource already exists");
       expect(exception.statusCode).toBe(HttpStatus.CONFLICT);
       expect(exception).toBeInstanceOf(HttpException);
     });
 
-    it("deve usar mensagem padrão se não fornecida", () => {
-      const exception = new ConflictException();
-
-      expect(exception.message).toBe("Conflict");
-    });
-  });
-
-  describe("InternalServerErrorException", () => {
-    it("deve criar exceção com status 500", () => {
-      const exception = new InternalServerErrorException("Server error");
+    it("deve criar exceção com status 500 (INTERNAL_SERVER_ERROR)", () => {
+      const exception = new HttpException("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
 
       expect(exception.message).toBe("Server error");
       expect(exception.statusCode).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
       expect(exception).toBeInstanceOf(HttpException);
     });
-
-    it("deve usar mensagem padrão se não fornecida", () => {
-      const exception = new InternalServerErrorException();
-
-      expect(exception.message).toBe("Internal Server Error");
-    });
   });
 
   describe("serialização", () => {
     it("deve ter propriedades acessíveis", () => {
-      const exception = new BadRequestException("Test error");
+      const exception = new HttpException("Test error", HttpStatus.BAD_REQUEST);
 
       expect(exception.message).toBe("Test error");
       expect(exception.statusCode).toBe(HttpStatus.BAD_REQUEST);
@@ -148,7 +93,7 @@ describe("HttpException", () => {
 
     it("deve incluir details quando fornecido", () => {
       const details = { field: "test" };
-      const exception = new BadRequestException("Error", details);
+      const exception = new HttpException("Error", HttpStatus.BAD_REQUEST, details);
 
       expect(exception.details).toEqual(details);
     });
@@ -157,12 +102,12 @@ describe("HttpException", () => {
   describe("casos de uso comuns", () => {
     it("deve criar exceções com mensagens personalizadas", () => {
       const exceptions = [
-        new BadRequestException("ID inválido"),
-        new UnauthorizedException("Token expirado"),
-        new ForbiddenException("Sem permissão"),
-        new NotFoundException("Usuário não encontrado"),
-        new ConflictException("Email já cadastrado"),
-        new InternalServerErrorException("Falha no banco de dados"),
+        new HttpException("ID inválido", HttpStatus.BAD_REQUEST),
+        new HttpException("Token expirado", HttpStatus.UNAUTHORIZED),
+        new HttpException("Sem permissão", HttpStatus.FORBIDDEN),
+        new HttpException("Usuário não encontrado", HttpStatus.NOT_FOUND),
+        new HttpException("Email já cadastrado", HttpStatus.CONFLICT),
+        new HttpException("Falha no banco de dados", HttpStatus.INTERNAL_SERVER_ERROR),
       ];
 
       exceptions.forEach((exception) => {
@@ -174,13 +119,12 @@ describe("HttpException", () => {
 
     it("deve permitir captura por tipo de exceção", () => {
       try {
-        throw new NotFoundException("User not found");
+        throw new HttpException("User not found", HttpStatus.NOT_FOUND);
       } catch (error) {
-        expect(error).toBeInstanceOf(NotFoundException);
         expect(error).toBeInstanceOf(HttpException);
         expect(error).toBeInstanceOf(Error);
 
-        if (error instanceof NotFoundException) {
+        if (error instanceof HttpException) {
           expect(error.statusCode).toBe(404);
         }
       }

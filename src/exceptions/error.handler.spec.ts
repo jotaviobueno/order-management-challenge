@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from "express";
 import { ErrorHandler } from "./error.handler";
 import { HttpException } from "./http.exception";
 import { HttpStatus } from "./http-status.enum";
-import { BadRequestException, NotFoundException } from "./index";
 import { ZodError } from "zod";
 
 describe("ErrorHandler", () => {
@@ -24,7 +23,7 @@ describe("ErrorHandler", () => {
 
   describe("execute", () => {
     it("deve tratar HttpException e retornar status correto", () => {
-      const error = new BadRequestException("Invalid input");
+      const error = new HttpException("Invalid input", HttpStatus.BAD_REQUEST);
 
       errorHandler.execute(error, mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -37,7 +36,7 @@ describe("ErrorHandler", () => {
 
     it("deve incluir details quando presentes", () => {
       const details = { field: "email", error: "invalid format" };
-      const error = new BadRequestException("Validation failed", details);
+      const error = new HttpException("Validation failed", HttpStatus.BAD_REQUEST, details);
 
       errorHandler.execute(error, mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -104,12 +103,9 @@ describe("ErrorHandler", () => {
 
     it("deve tratar diferentes tipos de HttpException", () => {
       const exceptions = [
-        { error: new BadRequestException("Bad request"), status: 400 },
-        { error: new NotFoundException("Not found"), status: 404 },
-        {
-          error: new HttpException("Custom", HttpStatus.UNAUTHORIZED),
-          status: 401,
-        },
+        { error: new HttpException("Bad request", HttpStatus.BAD_REQUEST), status: 400 },
+        { error: new HttpException("Not found", HttpStatus.NOT_FOUND), status: 404 },
+        { error: new HttpException("Custom", HttpStatus.UNAUTHORIZED), status: 401 },
       ];
 
       exceptions.forEach(({ error, status }) => {
@@ -162,7 +158,7 @@ describe("ErrorHandler", () => {
     });
 
     it("deve chamar response.status e response.json na ordem correta", () => {
-      const error = new BadRequestException("Test");
+      const error = new HttpException("Test", HttpStatus.BAD_REQUEST);
       const callOrder: string[] = [];
 
       mockResponse.status = vi.fn().mockImplementation(() => {

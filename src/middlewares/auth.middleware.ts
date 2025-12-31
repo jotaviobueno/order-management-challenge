@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { AlsService } from "../utils/async-context";
 import { JwtService } from "@/utils";
 import { USER_ID_CONSTANT, EMAIL_CONSTANT, ACCESS_TOKEN_CONSTANT } from "@/config";
-import { UnauthorizedException } from "../exceptions";
+import { HttpException, HttpStatus } from "../exceptions";
 import { Logger } from "../utils/logger";
 
 export class AuthMiddleware {
@@ -16,7 +16,7 @@ export class AuthMiddleware {
 
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
         this.logger.warn("Token não fornecido ou formato inválido");
-        throw new UnauthorizedException("Token não fornecido");
+        throw new HttpException("Token não fornecido", HttpStatus.UNAUTHORIZED);
       }
 
       const token = authHeader.substring(7);
@@ -38,7 +38,7 @@ export class AuthMiddleware {
         next();
       } catch {
         this.logger.warn("Token inválido ou expirado");
-        throw new UnauthorizedException("Token inválido ou expirado");
+        throw new HttpException("Token inválido ou expirado", HttpStatus.UNAUTHORIZED);
       }
     } catch (error) {
       this.logger.error("Erro na autenticação", error instanceof Error ? error.stack : undefined);

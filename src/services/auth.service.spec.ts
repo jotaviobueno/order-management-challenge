@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { AuthService } from "./auth.service";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
-import { UnauthorizedException } from "../exceptions";
+import { HttpException } from "../exceptions";
 import { UserAdapter } from "../adapters";
 import { UserService } from "./user.service";
 
@@ -68,7 +68,7 @@ describe("AuthService", () => {
       expect(result.user.email).toBe(mockUser.email);
     });
 
-    it("deve lançar UnauthorizedException se senha está incorreta", async () => {
+    it("deve lançar HttpException se senha está incorreta", async () => {
       const loginData = {
         email: "test@test.com",
         password: "wrongpassword",
@@ -83,7 +83,7 @@ describe("AuthService", () => {
       vi.spyOn(userService, "findByEmail").mockResolvedValue(mockUser as any);
       vi.spyOn(bcryptService, "compare").mockResolvedValue(false);
 
-      await expect(authService.login(loginData)).rejects.toThrow(UnauthorizedException);
+      await expect(authService.login(loginData)).rejects.toThrow(HttpException);
       await expect(authService.login(loginData)).rejects.toThrow("Credenciais inválidas");
     });
 

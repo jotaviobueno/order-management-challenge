@@ -1,5 +1,5 @@
 import { OrderState } from "../types/enums";
-import { BadRequestException } from "../exceptions";
+import { HttpException, HttpStatus } from "../exceptions";
 
 export class OrderStateMachine {
   private static readonly STATE_TRANSITIONS: Record<OrderState, OrderState[]> = {
@@ -23,9 +23,15 @@ export class OrderStateMachine {
 
     if (!nextState) {
       if (currentState === OrderState.COMPLETED) {
-        throw new BadRequestException("Pedido já está completo e não pode avançar mais");
+        throw new HttpException(
+          "Pedido já está completo e não pode avançar mais",
+          HttpStatus.BAD_REQUEST
+        );
       }
-      throw new BadRequestException(`Não há próximo estado disponível para: ${currentState}`);
+      throw new HttpException(
+        `Não há próximo estado disponível para: ${currentState}`,
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     return nextState;
@@ -34,10 +40,11 @@ export class OrderStateMachine {
   static validateTransition(currentState: OrderState, nextState: OrderState): void {
     if (!this.canTransition(currentState, nextState)) {
       const allowedTransitions = this.STATE_TRANSITIONS[currentState];
-      throw new BadRequestException(
+      throw new HttpException(
         `Transição inválida de ${currentState} para ${nextState}. Transições permitidas: ${
           allowedTransitions.join(", ") || "nenhuma"
-        }`
+        }`,
+        HttpStatus.BAD_REQUEST
       );
     }
   }
