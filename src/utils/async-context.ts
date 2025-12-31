@@ -3,8 +3,7 @@ import { AlsContextNotFoundException } from "../exceptions";
 import { DynamicContext } from "../types/context.types";
 
 export class AlsService {
-  private static readonly asyncLocalStorage =
-    new AsyncLocalStorage<DynamicContext>();
+  private static readonly asyncLocalStorage = new AsyncLocalStorage<DynamicContext>();
 
   static run<T>(context: DynamicContext, callback: () => T): T {
     return this.asyncLocalStorage.run(context, callback);

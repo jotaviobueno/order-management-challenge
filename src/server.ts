@@ -17,10 +17,7 @@ const startServer = async (): Promise<void> => {
       logger.log(`🔗 Health check: http://localhost:${config.port}/health`);
     });
   } catch (error) {
-    logger.error(
-      "❌ Erro ao iniciar servidor",
-      error instanceof Error ? error.stack : undefined
-    );
+    logger.error("❌ Erro ao iniciar servidor", error instanceof Error ? error.stack : undefined);
     process.exit(1);
   }
 };

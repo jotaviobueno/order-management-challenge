@@ -5,10 +5,6 @@ import { authController } from "../container";
 
 const router = Router();
 
-router.post(
-  "/login",
-  ValidateMiddleware.body(loginUserSchema),
-  authController.login
-);
+router.post("/login", ValidateMiddleware.body(loginUserSchema), authController.login);
 
 export { router as authRouter };

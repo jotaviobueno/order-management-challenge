@@ -22,11 +22,7 @@ describe("HttpException", () => {
 
     it("deve criar exceção com details opcionais", () => {
       const details = { field: "email", error: "invalid" };
-      const exception = new HttpException(
-        "Validation error",
-        HttpStatus.BAD_REQUEST,
-        details
-      );
+      const exception = new HttpException("Validation error", HttpStatus.BAD_REQUEST, details);
 
       expect(exception.details).toEqual(details);
     });

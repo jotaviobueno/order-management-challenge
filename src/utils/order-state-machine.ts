@@ -2,17 +2,13 @@ import { OrderState } from "../types/enums";
 import { BadRequestException } from "../exceptions";
 
 export class OrderStateMachine {
-  private static readonly STATE_TRANSITIONS: Record<OrderState, OrderState[]> =
-    {
-      [OrderState.CREATED]: [OrderState.ANALYSIS],
-      [OrderState.ANALYSIS]: [OrderState.COMPLETED],
-      [OrderState.COMPLETED]: [],
-    };
+  private static readonly STATE_TRANSITIONS: Record<OrderState, OrderState[]> = {
+    [OrderState.CREATED]: [OrderState.ANALYSIS],
+    [OrderState.ANALYSIS]: [OrderState.COMPLETED],
+    [OrderState.COMPLETED]: [],
+  };
 
-  static canTransition(
-    currentState: OrderState,
-    nextState: OrderState
-  ): boolean {
+  static canTransition(currentState: OrderState, nextState: OrderState): boolean {
     const allowedTransitions = this.STATE_TRANSITIONS[currentState];
     return allowedTransitions.includes(nextState);
   }
@@ -27,22 +23,15 @@ export class OrderStateMachine {
 
     if (!nextState) {
       if (currentState === OrderState.COMPLETED) {
-        throw new BadRequestException(
-          "Pedido já está completo e não pode avançar mais"
-        );
+        throw new BadRequestException("Pedido já está completo e não pode avançar mais");
       }
-      throw new BadRequestException(
-        `Não há próximo estado disponível para: ${currentState}`
-      );
+      throw new BadRequestException(`Não há próximo estado disponível para: ${currentState}`);
     }
 
     return nextState;
   }
 
-  static validateTransition(
-    currentState: OrderState,
-    nextState: OrderState
-  ): void {
+  static validateTransition(currentState: OrderState, nextState: OrderState): void {
     if (!this.canTransition(currentState, nextState)) {
       const allowedTransitions = this.STATE_TRANSITIONS[currentState];
       throw new BadRequestException(

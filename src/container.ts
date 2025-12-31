@@ -32,18 +32,8 @@ const userAdapter = new UserAdapter();
 const orderAdapter = new OrderAdapter();
 
 // Services with dependencies
-const userService = new UserService(
-  userRepository,
-  bcryptService,
-  jwtService,
-  userAdapter
-);
-const authService = new AuthService(
-  userService,
-  bcryptService,
-  jwtService,
-  userAdapter
-);
+const userService = new UserService(userRepository, bcryptService, jwtService, userAdapter);
+const authService = new AuthService(userService, bcryptService, jwtService, userAdapter);
 const orderService = new OrderService(orderRepository, orderAdapter);
 
 // Controllers

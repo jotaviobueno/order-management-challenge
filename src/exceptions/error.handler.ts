@@ -5,12 +5,7 @@ import { HttpException } from "./http.exception";
 import { HttpStatus } from "./http-status.enum";
 
 export class ErrorHandler {
-  execute(
-    error: Error,
-    _req: Request,
-    res: Response,
-    _next: NextFunction
-  ): void {
+  execute(error: Error, _req: Request, res: Response, _next: NextFunction): void {
     if (error instanceof HttpException) {
       res.status(error.statusCode).json({
         statusCode: error.statusCode,

@@ -22,17 +22,12 @@ export class MetadataMiddleware {
     const authorization = req.headers["authorization"] as string;
     const token = authorization?.split(" ")?.[1];
 
-    const requestId =
-      (req.headers["x-request-id"] as string | undefined) || randomUUID();
+    const requestId = (req.headers["x-request-id"] as string | undefined) || randomUUID();
     const startTime = Date.now();
 
     res.setHeader("X-Request-Id", requestId);
 
-    const ipAddress =
-      xRealIp ||
-      xForwardedFor?.split(",")[0] ||
-      req.ip ||
-      req.socket.remoteAddress;
+    const ipAddress = xRealIp || xForwardedFor?.split(",")[0] || req.ip || req.socket.remoteAddress;
 
     const metadata = {
       [ENDPOINT_CONSTANT]: url,
@@ -49,9 +44,7 @@ export class MetadataMiddleware {
 
     AlsService.run(cleanMetadata, () => {
       MetadataMiddleware.logger.log(`Iniciando endpoint: ${url}`);
-      MetadataMiddleware.logger.debug(
-        `Metadata setado: ${JSON.stringify(cleanMetadata)}`
-      );
+      MetadataMiddleware.logger.debug(`Metadata setado: ${JSON.stringify(cleanMetadata)}`);
 
       next();
     });

@@ -2,11 +2,7 @@ import { UserRepository } from "../repositories/user.repository";
 import { CreateUserDto, ListUsersQueryDto } from "../dtos/user.dto";
 import { IUser, IUserResponse } from "../types/user.types";
 import { IAuthResponse } from "../types/auth.types";
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from "../exceptions";
+import { BadRequestException, ConflictException, NotFoundException } from "../exceptions";
 import { MongoIdValidator, Logger } from "@/utils";
 import { PaginatedResult } from "../types/pagination.types";
 import { BcryptService } from "../utils/bcrypt";
@@ -29,9 +25,7 @@ export class UserService {
     const existingUser = await this.userRepository.existsByEmail(data.email);
 
     if (existingUser) {
-      this.logger.warn(
-        `Tentativa de criar usuário com email duplicado: ${data.email}`
-      );
+      this.logger.warn(`Tentativa de criar usuário com email duplicado: ${data.email}`);
       throw new ConflictException("Email já cadastrado");
     }
 
@@ -90,21 +84,15 @@ export class UserService {
     return this.userAdapter.toResponse(user);
   }
 
-  async findAll(
-    query: ListUsersQueryDto
-  ): Promise<PaginatedResult<IUserResponse>> {
-    this.logger.debug(
-      `Buscando usuários - Página: ${query.page}, Limite: ${query.limit}`
-    );
+  async findAll(query: ListUsersQueryDto): Promise<PaginatedResult<IUserResponse>> {
+    this.logger.debug(`Buscando usuários - Página: ${query.page}, Limite: ${query.limit}`);
 
     const result = await this.userRepository.findAll({
       page: query.page,
       limit: query.limit,
     });
 
-    this.logger.log(
-      `${result.data.length} usuário(s) encontrado(s) na página ${query.page}`
-    );
+    this.logger.log(`${result.data.length} usuário(s) encontrado(s) na página ${query.page}`);
 
     return {
       data: this.userAdapter.toResponseList(result.data),

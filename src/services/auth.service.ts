@@ -20,10 +20,7 @@ export class AuthService {
   async login(data: LoginUserDto): Promise<IAuthResponse> {
     const user = await this.userService.findByEmail(data.email);
 
-    const isPasswordValid = await this.bcryptService.compare(
-      data.password,
-      user.password
-    );
+    const isPasswordValid = await this.bcryptService.compare(data.password, user.password);
 
     if (!isPasswordValid) {
       this.logger.warn(`Tentativa de login com senha inválida: ${data.email}`);

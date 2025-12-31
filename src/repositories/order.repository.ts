@@ -22,9 +22,7 @@ export class OrderRepository {
     return Order.findById(id);
   }
 
-  async findAll(
-    options: OrderPaginationOptions
-  ): Promise<PaginatedResult<IOrder>> {
+  async findAll(options: OrderPaginationOptions): Promise<PaginatedResult<IOrder>> {
     const { page, limit, state } = options;
     const skip = (page - 1) * limit;
 
@@ -54,11 +52,7 @@ export class OrderRepository {
   }
 
   async updateState(id: string, state: OrderState): Promise<IOrder | null> {
-    return Order.findByIdAndUpdate(
-      id,
-      { state, updatedAt: new Date() },
-      { new: true }
-    );
+    return Order.findByIdAndUpdate(id, { state, updatedAt: new Date() }, { new: true });
   }
 
   async softDelete(id: string): Promise<IOrder | null> {

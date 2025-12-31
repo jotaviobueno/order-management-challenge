@@ -164,13 +164,9 @@ describe("OrderRepository", () => {
 
   describe("existsById", () => {
     it("deve retornar true se pedido existe e está ativo", async () => {
-      Order.findOne = vi
-        .fn()
-        .mockResolvedValue({ _id: "507f1f77bcf86cd799439011" });
+      Order.findOne = vi.fn().mockResolvedValue({ _id: "507f1f77bcf86cd799439011" });
 
-      const result = await orderRepository.existsById(
-        "507f1f77bcf86cd799439011"
-      );
+      const result = await orderRepository.existsById("507f1f77bcf86cd799439011");
 
       expect(result).toBe(true);
       expect(Order.findOne).toHaveBeenCalledWith({
@@ -182,9 +178,7 @@ describe("OrderRepository", () => {
     it("deve retornar false se pedido não existe", async () => {
       Order.findOne = vi.fn().mockResolvedValue(null);
 
-      const result = await orderRepository.existsById(
-        "507f1f77bcf86cd799439011"
-      );
+      const result = await orderRepository.existsById("507f1f77bcf86cd799439011");
 
       expect(result).toBe(false);
     });

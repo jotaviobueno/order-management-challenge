@@ -12,16 +12,11 @@ export const createOrderSchema = z
     lab: z.string().min(1, "Lab é obrigatório"),
     patient: z.string().min(1, "Paciente é obrigatório"),
     customer: z.string().min(1, "Cliente é obrigatório"),
-    services: z
-      .array(serviceSchema)
-      .min(1, "Pelo menos um serviço é obrigatório"),
+    services: z.array(serviceSchema).min(1, "Pelo menos um serviço é obrigatório"),
   })
   .refine(
     (data) => {
-      const totalValue = data.services.reduce(
-        (sum, service) => sum + service.value,
-        0
-      );
+      const totalValue = data.services.reduce((sum, service) => sum + service.value, 0);
       return totalValue > 0;
     },
     {

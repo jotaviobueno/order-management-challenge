@@ -5,16 +5,8 @@ import { userController } from "../container";
 
 const router = Router();
 
-router.post(
-  "/",
-  ValidateMiddleware.body(createUserSchema),
-  userController.create
-);
-router.get(
-  "/",
-  ValidateMiddleware.query(listUsersQuerySchema),
-  userController.findAll
-);
+router.post("/", ValidateMiddleware.body(createUserSchema), userController.create);
+router.get("/", ValidateMiddleware.query(listUsersQuerySchema), userController.findAll);
 router.get("/:id", userController.findById);
 router.delete("/:id", userController.softDelete);
 

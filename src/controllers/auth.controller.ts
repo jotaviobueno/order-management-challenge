@@ -6,11 +6,7 @@ import { HttpStatus } from "../exceptions";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  login = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const data: LoginUserDto = req.body;
       const result = await this.authService.login(data);

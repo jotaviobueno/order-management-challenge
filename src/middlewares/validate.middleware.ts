@@ -6,16 +6,10 @@ export class ValidateMiddleware {
   private static logger = new Logger(ValidateMiddleware.name);
 
   static body(schema: z.ZodType<any>) {
-    return async (
-      req: Request,
-      _res: Response,
-      next: NextFunction
-    ): Promise<void> => {
+    return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
       try {
         this.logger.debug(
-          `Validando body da requisição: ${req.method} ${
-            req.originalUrl || req.url
-          }`
+          `Validando body da requisição: ${req.method} ${req.originalUrl || req.url}`
         );
         req.body = await schema.parseAsync(req.body);
         this.logger.debug("Body validado com sucesso");
@@ -31,16 +25,10 @@ export class ValidateMiddleware {
   }
 
   static query(schema: z.ZodType<any>) {
-    return async (
-      req: Request,
-      _res: Response,
-      next: NextFunction
-    ): Promise<void> => {
+    return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
       try {
         this.logger.debug(
-          `Validando query params da requisição: ${req.method} ${
-            req.originalUrl || req.url
-          }`
+          `Validando query params da requisição: ${req.method} ${req.originalUrl || req.url}`
         );
         req.query = await schema.parseAsync(req.query);
         this.logger.debug("Query params validados com sucesso");

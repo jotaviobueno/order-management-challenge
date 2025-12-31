@@ -5,16 +5,8 @@ import { orderController, authMiddleware } from "../container";
 
 const router = Router();
 router.use((req, res, next) => authMiddleware.execute(req, res, next));
-router.post(
-  "/",
-  ValidateMiddleware.body(createOrderSchema),
-  orderController.create
-);
-router.get(
-  "/",
-  ValidateMiddleware.query(listOrdersQuerySchema),
-  orderController.findAll
-);
+router.post("/", ValidateMiddleware.body(createOrderSchema), orderController.create);
+router.get("/", ValidateMiddleware.query(listOrdersQuerySchema), orderController.findAll);
 router.get("/:id", orderController.findById);
 router.patch("/:id/advance", orderController.advance);
 router.delete("/:id", orderController.softDelete);

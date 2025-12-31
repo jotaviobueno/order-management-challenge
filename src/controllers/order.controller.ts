@@ -6,11 +6,7 @@ import { HttpStatus } from "../exceptions";
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  create = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const data: CreateOrderDto = req.body;
       const result = await this.orderService.create(data);
@@ -24,11 +20,7 @@ export class OrderController {
     }
   };
 
-  findById = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  findById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       const order = await this.orderService.findById(id);
@@ -41,11 +33,7 @@ export class OrderController {
     }
   };
 
-  findAll = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  findAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const query: ListOrdersQueryDto = {
         page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
@@ -61,11 +49,7 @@ export class OrderController {
     }
   };
 
-  advance = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  advance = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       const result = await this.orderService.advance(id);
@@ -79,11 +63,7 @@ export class OrderController {
     }
   };
 
-  softDelete = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  softDelete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       await this.orderService.softDelete(id);

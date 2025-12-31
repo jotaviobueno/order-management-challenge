@@ -46,11 +46,7 @@ describe("AuthMiddleware", () => {
       vi.spyOn(AlsService, "set");
       vi.spyOn(AlsService, "has").mockReturnValue(false);
 
-      await authMiddleware.execute(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await authMiddleware.execute(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockJwtService.verify).toHaveBeenCalledWith(mockToken);
       expect(AlsService.set).toHaveBeenCalledWith("userId", mockDecoded.sub);
@@ -63,11 +59,7 @@ describe("AuthMiddleware", () => {
     it("deve lançar UnauthorizedException se authorization header não existir", async () => {
       mockRequest.headers = {};
 
-      await authMiddleware.execute(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await authMiddleware.execute(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
       const error = (mockNext as any).mock.calls[0][0];
@@ -80,11 +72,7 @@ describe("AuthMiddleware", () => {
         authorization: "InvalidFormat token",
       };
 
-      await authMiddleware.execute(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await authMiddleware.execute(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
       const error = (mockNext as any).mock.calls[0][0];
@@ -101,11 +89,7 @@ describe("AuthMiddleware", () => {
         throw new Error("Invalid token");
       });
 
-      await authMiddleware.execute(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await authMiddleware.execute(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
       const error = (mockNext as any).mock.calls[0][0];
@@ -124,11 +108,7 @@ describe("AuthMiddleware", () => {
         throw error;
       });
 
-      await authMiddleware.execute(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await authMiddleware.execute(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
       const error = (mockNext as any).mock.calls[0][0];
@@ -151,11 +131,7 @@ describe("AuthMiddleware", () => {
       vi.spyOn(AlsService, "set");
       vi.spyOn(AlsService, "has").mockReturnValue(true);
 
-      await authMiddleware.execute(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await authMiddleware.execute(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(AlsService.has).toHaveBeenCalledWith("accessToken");
       expect(AlsService.set).toHaveBeenCalledTimes(2);
@@ -178,11 +154,7 @@ describe("AuthMiddleware", () => {
       vi.spyOn(AlsService, "set");
       vi.spyOn(AlsService, "has").mockReturnValue(false);
 
-      await authMiddleware.execute(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await authMiddleware.execute(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockJwtService.verify).toHaveBeenCalledWith(mockToken);
     });

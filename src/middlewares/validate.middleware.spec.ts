@@ -27,11 +27,7 @@ describe("ValidateMiddleware", () => {
       };
 
       const middleware = ValidateMiddleware.body(schema);
-      await middleware(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await middleware(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockRequest.body.email).toBe("test@test.com");
@@ -50,11 +46,7 @@ describe("ValidateMiddleware", () => {
       };
 
       const middleware = ValidateMiddleware.body(schema);
-      await middleware(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await middleware(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
       const error = (mockNext as any).mock.calls[0][0];
@@ -72,11 +64,7 @@ describe("ValidateMiddleware", () => {
       };
 
       const middleware = ValidateMiddleware.body(schema);
-      await middleware(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await middleware(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockRequest.body.age).toBe(25);
@@ -92,11 +80,7 @@ describe("ValidateMiddleware", () => {
       mockRequest.body = {};
 
       const middleware = ValidateMiddleware.body(schema);
-      await middleware(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await middleware(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockRequest.body.page).toBe(1);
@@ -117,11 +101,7 @@ describe("ValidateMiddleware", () => {
       };
 
       const middleware = ValidateMiddleware.query(schema);
-      await middleware(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await middleware(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockRequest.query.page).toBe(2);
@@ -138,11 +118,7 @@ describe("ValidateMiddleware", () => {
       };
 
       const middleware = ValidateMiddleware.query(schema);
-      await middleware(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await middleware(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
       const error = (mockNext as any).mock.calls[0][0];
@@ -159,11 +135,7 @@ describe("ValidateMiddleware", () => {
       mockRequest.query = {};
 
       const middleware = ValidateMiddleware.query(schema);
-      await middleware(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await middleware(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockRequest.query.page).toBe(1);
@@ -182,11 +154,7 @@ describe("ValidateMiddleware", () => {
       };
 
       const middleware = ValidateMiddleware.query(schema);
-      await middleware(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await middleware(mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockRequest.query.status).toBe("ACTIVE");

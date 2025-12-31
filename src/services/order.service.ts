@@ -19,16 +19,11 @@ export class OrderService {
   async create(data: CreateOrderDto): Promise<IOrderResponse> {
     this.logger.log(`Tentando criar pedido para paciente: ${data.patient}`);
 
-    const totalValue = data.services.reduce(
-      (sum, service) => sum + service.value,
-      0
-    );
+    const totalValue = data.services.reduce((sum, service) => sum + service.value, 0);
 
     if (totalValue <= 0) {
       this.logger.warn(`Tentativa de criar pedido com valor total zerado`);
-      throw new BadRequestException(
-        "O valor total dos serviços deve ser maior que zero"
-      );
+      throw new BadRequestException("O valor total dos serviços deve ser maior que zero");
     }
 
     if (!data.services || data.services.length === 0) {
@@ -38,9 +33,7 @@ export class OrderService {
 
     const order = await this.orderRepository.create(data);
 
-    this.logger.log(
-      `Pedido criado com sucesso: ${order._id} - Estado: ${order.state}`
-    );
+    this.logger.log(`Pedido criado com sucesso: ${order._id} - Estado: ${order.state}`);
     return this.orderAdapter.toResponse(order);
   }
 
@@ -64,9 +57,7 @@ export class OrderService {
     return this.orderAdapter.toResponse(order);
   }
 
-  async findAll(
-    query: ListOrdersQueryDto
-  ): Promise<PaginatedResult<IOrderResponse>> {
+  async findAll(query: ListOrdersQueryDto): Promise<PaginatedResult<IOrderResponse>> {
     this.logger.debug(
       `Buscando pedidos - Página: ${query.page}, Limite: ${
         query.limit
@@ -79,9 +70,7 @@ export class OrderService {
       state: query.state,
     });
 
-    this.logger.log(
-      `${result.data.length} pedido(s) encontrado(s) na página ${query.page}`
-    );
+    this.logger.log(`${result.data.length} pedido(s) encontrado(s) na página ${query.page}`);
 
     return {
       data: this.orderAdapter.toResponseList(result.data),
@@ -106,16 +95,12 @@ export class OrderService {
       this.logger.warn(
         `Tentativa de avançar pedido em estado final: ${id} - Estado: ${currentState}`
       );
-      throw new BadRequestException(
-        `Pedido já está no estado final: ${currentState}`
-      );
+      throw new BadRequestException(`Pedido já está no estado final: ${currentState}`);
     }
 
     const nextState = OrderStateMachine.advance(currentState);
 
-    this.logger.log(
-      `Avançando pedido ${id} de ${currentState} para ${nextState}`
-    );
+    this.logger.log(`Avançando pedido ${id} de ${currentState} para ${nextState}`);
 
     const updatedOrder = await this.orderRepository.updateState(id, nextState);
 
@@ -136,9 +121,7 @@ export class OrderService {
 
     if (order.state === OrderState.COMPLETED) {
       this.logger.warn(`Tentativa de exclusão de pedido já concluído: ${id}`);
-      throw new BadRequestException(
-        "Não é possível excluir um pedido já concluído"
-      );
+      throw new BadRequestException("Não é possível excluir um pedido já concluído");
     }
 
     const update = await this.orderRepository.softDelete(order.id);

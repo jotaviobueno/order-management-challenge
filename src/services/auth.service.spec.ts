@@ -32,12 +32,7 @@ describe("AuthService", () => {
 
     const userAdapter = new UserAdapter();
 
-    authService = new AuthService(
-      userService,
-      bcryptService,
-      jwtService,
-      userAdapter
-    );
+    authService = new AuthService(userService, bcryptService, jwtService, userAdapter);
     vi.clearAllMocks();
   });
 
@@ -63,10 +58,7 @@ describe("AuthService", () => {
       const result = await authService.login(loginData);
 
       expect(userService.findByEmail).toHaveBeenCalledWith(loginData.email);
-      expect(bcryptService.compare).toHaveBeenCalledWith(
-        loginData.password,
-        mockUser.password
-      );
+      expect(bcryptService.compare).toHaveBeenCalledWith(loginData.password, mockUser.password);
       expect(jwtService.generate).toHaveBeenCalledWith({
         sub: mockUser._id.toString(),
         email: mockUser.email,
@@ -91,12 +83,8 @@ describe("AuthService", () => {
       vi.spyOn(userService, "findByEmail").mockResolvedValue(mockUser as any);
       vi.spyOn(bcryptService, "compare").mockResolvedValue(false);
 
-      await expect(authService.login(loginData)).rejects.toThrow(
-        UnauthorizedException
-      );
-      await expect(authService.login(loginData)).rejects.toThrow(
-        "Credenciais inválidas"
-      );
+      await expect(authService.login(loginData)).rejects.toThrow(UnauthorizedException);
+      await expect(authService.login(loginData)).rejects.toThrow("Credenciais inválidas");
     });
 
     it("não deve chamar JwtService.generate se senha for inválida", async () => {

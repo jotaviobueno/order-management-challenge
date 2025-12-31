@@ -142,9 +142,7 @@ describe("OrderAdapter", () => {
           customer: "Customer 1",
           state: OrderState.CREATED,
           status: OrderStatus.ACTIVE,
-          services: [
-            { name: "Service 1", value: 100, status: ServiceStatus.PENDING },
-          ],
+          services: [{ name: "Service 1", value: 100, status: ServiceStatus.PENDING }],
           createdAt: new Date("2024-01-01"),
           updatedAt: new Date("2024-01-02"),
         },

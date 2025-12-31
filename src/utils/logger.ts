@@ -34,11 +34,7 @@ export class Logger {
     return `${date} ${time}`;
   }
 
-  private formatMessage(
-    level: LogLevel,
-    message: string,
-    context?: string
-  ): string {
+  private formatMessage(level: LogLevel, message: string, context?: string): string {
     const { colors } = Logger;
     const timestamp = this.options.timestamp
       ? `${colors.dim}[${this.getTimestamp()}]${colors.reset} `
@@ -79,16 +75,9 @@ export class Logger {
     return `${timestamp}${requestIdStr}${levelFormatted} ${contextStr}${message}`;
   }
 
-  private print(
-    level: LogLevel,
-    message: any,
-    context?: string,
-    trace?: string
-  ): void {
+  private print(level: LogLevel, message: any, context?: string, trace?: string): void {
     const messageStr =
-      typeof message === "object"
-        ? JSON.stringify(message, null, 2)
-        : String(message);
+      typeof message === "object" ? JSON.stringify(message, null, 2) : String(message);
     const formattedMessage = this.formatMessage(level, messageStr, context);
 
     switch (level) {

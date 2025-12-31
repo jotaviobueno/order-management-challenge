@@ -4,11 +4,7 @@ import { UserRepository } from "../repositories/user.repository";
 import { BcryptService } from "../utils/bcrypt";
 import { JwtService } from "../utils/jwt";
 import { MongoIdValidator } from "../utils/mongo-id.validator";
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from "../exceptions";
+import { BadRequestException, ConflictException, NotFoundException } from "../exceptions";
 import { UserAdapter } from "../adapters";
 
 vi.mock("../utils/bcrypt");
@@ -43,12 +39,7 @@ describe("UserService", () => {
 
     const userAdapter = new UserAdapter();
 
-    userService = new UserService(
-      userRepository,
-      bcryptService,
-      jwtService,
-      userAdapter
-    );
+    userService = new UserService(userRepository, bcryptService, jwtService, userAdapter);
     vi.clearAllMocks();
   });
 
@@ -99,12 +90,8 @@ describe("UserService", () => {
 
       vi.spyOn(userRepository, "existsByEmail").mockResolvedValue(true);
 
-      await expect(userService.create(userData)).rejects.toThrow(
-        ConflictException
-      );
-      await expect(userService.create(userData)).rejects.toThrow(
-        "Email já cadastrado"
-      );
+      await expect(userService.create(userData)).rejects.toThrow(ConflictException);
+      await expect(userService.create(userData)).rejects.toThrow("Email já cadastrado");
     });
 
     it("não deve chamar create se email já existe", async () => {
@@ -147,12 +134,8 @@ describe("UserService", () => {
 
       vi.spyOn(userRepository, "getByEmail").mockResolvedValue(null);
 
-      await expect(userService.findByEmail(email)).rejects.toThrow(
-        NotFoundException
-      );
-      await expect(userService.findByEmail(email)).rejects.toThrow(
-        "Usuário não encontrado"
-      );
+      await expect(userService.findByEmail(email)).rejects.toThrow(NotFoundException);
+      await expect(userService.findByEmail(email)).rejects.toThrow("Usuário não encontrado");
     });
   });
 
@@ -182,12 +165,8 @@ describe("UserService", () => {
 
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(false);
 
-      await expect(userService.findById(invalidId)).rejects.toThrow(
-        BadRequestException
-      );
-      await expect(userService.findById(invalidId)).rejects.toThrow(
-        "ID inválido"
-      );
+      await expect(userService.findById(invalidId)).rejects.toThrow(BadRequestException);
+      await expect(userService.findById(invalidId)).rejects.toThrow("ID inválido");
     });
 
     it("deve lançar NotFoundException se usuário não existe", async () => {
@@ -197,9 +176,7 @@ describe("UserService", () => {
       vi.spyOn(userRepository, "getById").mockResolvedValue(null);
 
       await expect(userService.findById(id)).rejects.toThrow(NotFoundException);
-      await expect(userService.findById(id)).rejects.toThrow(
-        "Usuário não encontrado"
-      );
+      await expect(userService.findById(id)).rejects.toThrow("Usuário não encontrado");
     });
   });
 
@@ -291,9 +268,7 @@ describe("UserService", () => {
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(true);
       vi.spyOn(userRepository, "getById").mockResolvedValue(null);
 
-      await expect(userService.softDelete(id)).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(userService.softDelete(id)).rejects.toThrow(NotFoundException);
     });
 
     it("deve lançar NotFoundException se soft delete falhar", async () => {
@@ -309,12 +284,8 @@ describe("UserService", () => {
       vi.spyOn(userRepository, "getById").mockResolvedValue(mockUser as any);
       vi.spyOn(userRepository, "softDelete").mockResolvedValue(null);
 
-      await expect(userService.softDelete(id)).rejects.toThrow(
-        NotFoundException
-      );
-      await expect(userService.softDelete(id)).rejects.toThrow(
-        "Usuário não encontrado"
-      );
+      await expect(userService.softDelete(id)).rejects.toThrow(NotFoundException);
+      await expect(userService.softDelete(id)).rejects.toThrow("Usuário não encontrado");
     });
   });
 });

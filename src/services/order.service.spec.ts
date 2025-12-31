@@ -63,9 +63,7 @@ describe("OrderService", () => {
         services: [{ name: "Service 1", value: 0, status: "PENDING" as any }],
       };
 
-      await expect(orderService.create(orderData)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(orderService.create(orderData)).rejects.toThrow(BadRequestException);
       await expect(orderService.create(orderData)).rejects.toThrow(
         "O valor total dos serviços deve ser maior que zero"
       );
@@ -79,9 +77,7 @@ describe("OrderService", () => {
         services: [],
       };
 
-      await expect(orderService.create(orderData)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(orderService.create(orderData)).rejects.toThrow(BadRequestException);
       await expect(orderService.create(orderData)).rejects.toThrow(
         "O valor total dos serviços deve ser maior que zero"
       );
@@ -146,12 +142,8 @@ describe("OrderService", () => {
 
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(false);
 
-      await expect(orderService.findById(invalidId)).rejects.toThrow(
-        BadRequestException
-      );
-      await expect(orderService.findById(invalidId)).rejects.toThrow(
-        "ID inválido"
-      );
+      await expect(orderService.findById(invalidId)).rejects.toThrow(BadRequestException);
+      await expect(orderService.findById(invalidId)).rejects.toThrow("ID inválido");
     });
 
     it("deve lançar NotFoundException se pedido não existe", async () => {
@@ -160,12 +152,8 @@ describe("OrderService", () => {
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(true);
       vi.spyOn(orderRepository, "findById").mockResolvedValue(null);
 
-      await expect(orderService.findById(id)).rejects.toThrow(
-        NotFoundException
-      );
-      await expect(orderService.findById(id)).rejects.toThrow(
-        "Pedido não encontrado"
-      );
+      await expect(orderService.findById(id)).rejects.toThrow(NotFoundException);
+      await expect(orderService.findById(id)).rejects.toThrow("Pedido não encontrado");
     });
   });
 
@@ -264,22 +252,13 @@ describe("OrderService", () => {
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(true);
       vi.spyOn(orderRepository, "findById").mockResolvedValue(mockOrder as any);
       vi.spyOn(OrderStateMachine, "isFinalState").mockReturnValue(false);
-      vi.spyOn(OrderStateMachine, "advance").mockReturnValue(
-        OrderState.ANALYSIS
-      );
-      vi.spyOn(orderRepository, "updateState").mockResolvedValue(
-        updatedOrder as any
-      );
+      vi.spyOn(OrderStateMachine, "advance").mockReturnValue(OrderState.ANALYSIS);
+      vi.spyOn(orderRepository, "updateState").mockResolvedValue(updatedOrder as any);
 
       const result = await orderService.advance(id);
 
-      expect(OrderStateMachine.advance).toHaveBeenCalledWith(
-        OrderState.CREATED
-      );
-      expect(orderRepository.updateState).toHaveBeenCalledWith(
-        id,
-        OrderState.ANALYSIS
-      );
+      expect(OrderStateMachine.advance).toHaveBeenCalledWith(OrderState.CREATED);
+      expect(orderRepository.updateState).toHaveBeenCalledWith(id, OrderState.ANALYSIS);
       expect(result.state).toBe(OrderState.ANALYSIS);
     });
 
@@ -299,9 +278,7 @@ describe("OrderService", () => {
       vi.spyOn(orderRepository, "findById").mockResolvedValue(mockOrder as any);
       vi.spyOn(OrderStateMachine, "isFinalState").mockReturnValue(true);
 
-      await expect(orderService.advance(id)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(orderService.advance(id)).rejects.toThrow(BadRequestException);
       await expect(orderService.advance(id)).rejects.toThrow(
         "Pedido já está no estado final: COMPLETED"
       );
@@ -322,15 +299,11 @@ describe("OrderService", () => {
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(true);
       vi.spyOn(orderRepository, "findById").mockResolvedValue(mockOrder as any);
       vi.spyOn(OrderStateMachine, "isFinalState").mockReturnValue(false);
-      vi.spyOn(OrderStateMachine, "advance").mockReturnValue(
-        OrderState.ANALYSIS
-      );
+      vi.spyOn(OrderStateMachine, "advance").mockReturnValue(OrderState.ANALYSIS);
       vi.spyOn(orderRepository, "updateState").mockResolvedValue(null);
 
       await expect(orderService.advance(id)).rejects.toThrow(NotFoundException);
-      await expect(orderService.advance(id)).rejects.toThrow(
-        "Falha ao atualizar pedido"
-      );
+      await expect(orderService.advance(id)).rejects.toThrow("Falha ao atualizar pedido");
     });
   });
 
@@ -349,9 +322,7 @@ describe("OrderService", () => {
 
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(true);
       vi.spyOn(orderRepository, "findById").mockResolvedValue(mockOrder as any);
-      vi.spyOn(orderRepository, "softDelete").mockResolvedValue(
-        mockOrder as any
-      );
+      vi.spyOn(orderRepository, "softDelete").mockResolvedValue(mockOrder as any);
 
       await orderService.softDelete(id);
 
@@ -373,9 +344,7 @@ describe("OrderService", () => {
       vi.spyOn(MongoIdValidator, "isValid").mockReturnValue(true);
       vi.spyOn(orderRepository, "findById").mockResolvedValue(mockOrder as any);
 
-      await expect(orderService.softDelete(id)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(orderService.softDelete(id)).rejects.toThrow(BadRequestException);
       await expect(orderService.softDelete(id)).rejects.toThrow(
         "Não é possível excluir um pedido já concluído"
       );
@@ -397,9 +366,7 @@ describe("OrderService", () => {
       vi.spyOn(orderRepository, "findById").mockResolvedValue(mockOrder as any);
       vi.spyOn(orderRepository, "softDelete").mockResolvedValue(null);
 
-      await expect(orderService.softDelete(id)).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(orderService.softDelete(id)).rejects.toThrow(NotFoundException);
     });
   });
 });

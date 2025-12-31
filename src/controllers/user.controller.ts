@@ -6,11 +6,7 @@ import { HttpStatus } from "../exceptions";
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  create = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const data: CreateUserDto = req.body;
       const result = await this.userService.create(data);
@@ -24,11 +20,7 @@ export class UserController {
     }
   };
 
-  findById = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  findById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
 
@@ -42,11 +34,7 @@ export class UserController {
     }
   };
 
-  findAll = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  findAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const query: ListUsersQueryDto = {
         page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
@@ -61,11 +49,7 @@ export class UserController {
     }
   };
 
-  softDelete = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  softDelete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
 

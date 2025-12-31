@@ -168,21 +168,59 @@ docker compose logs -f mongodb
 
 ## 🏃 Execução
 
+### Scripts Disponíveis (Estilo NestJS)
+
+| Script | Descrição |
+|--------|-----------|
+| `npm run start:dev` | Modo desenvolvimento com hot-reload |
+| `npm run start:debug` | Modo desenvolvimento com debugger (porta 9229) |
+| `npm run build` | Build de desenvolvimento (bundle único) |
+| `npm run build:prod` | Build de produção (minificado) |
+| `npm run start` | Executar build |
+| `npm run start:prod` | Executar build em modo produção |
+| `npm run format` | Formatar código com Prettier |
+| `npm run lint` | Executar ESLint e corrigir problemas |
+| `npm run lint:check` | Verificar código com ESLint (sem correção) |
+
 ### Modo Desenvolvimento (com hot reload)
 
 ```bash
-npm run dev
+npm run start:dev
+```
+
+### Modo Debug
+
+```bash
+npm run start:debug
+# Attach debugger na porta 9229
 ```
 
 ### Build para Produção
 
 ```bash
-# Build (compila TypeScript)
-npm run build
+# Build de produção (minificado, bundle único)
+npm run build:prod
 
 # Executar em produção
-npm start
+npm run start:prod
 ```
+
+### Estrutura de Build
+
+O sistema utiliza **esbuild** para gerar um bundle único otimizado:
+
+```
+dist/
+└── main.js        # Bundle único (~22KB minificado)
+└── main.js.map    # Source map para debug
+```
+
+**Características do build:**
+- 🚀 **Build ultra-rápido** (~20ms)
+- 📦 **Bundle único** - toda aplicação em um arquivo
+- 🔧 **Minificado** em produção
+- 🗺️ **Source maps** para debug
+- 🌳 **Tree-shaking** para remover código não utilizado
 
 ## 🧪 Testes
 

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import { Request, Response } from "express";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { Request, Response, NextFunction } from "express";
 import { ErrorHandler } from "./error.handler";
 import { HttpException } from "./http.exception";
 import { HttpStatus } from "./http-status.enum";
@@ -9,7 +9,7 @@ import { ZodError } from "zod";
 describe("ErrorHandler", () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
-  let mockNext: Mock;
+  let mockNext: NextFunction;
   let errorHandler: ErrorHandler;
 
   beforeEach(() => {
@@ -18,7 +18,7 @@ describe("ErrorHandler", () => {
       status: vi.fn().mockReturnThis(),
       json: vi.fn().mockReturnThis(),
     };
-    mockNext = vi.fn();
+    mockNext = vi.fn() as unknown as NextFunction;
     errorHandler = new ErrorHandler();
   });
 
@@ -26,12 +26,7 @@ describe("ErrorHandler", () => {
     it("deve tratar HttpException e retornar status correto", () => {
       const error = new BadRequestException("Invalid input");
 
-      errorHandler.execute(
-        error,
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      errorHandler.execute(error, mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
       const response = (mockResponse.json as any).mock.calls[0][0];
@@ -44,12 +39,7 @@ describe("ErrorHandler", () => {
       const details = { field: "email", error: "invalid format" };
       const error = new BadRequestException("Validation failed", details);
 
-      errorHandler.execute(
-        error,
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      errorHandler.execute(error, mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockResponse.json).toHaveBeenCalledWith({
         statusCode: HttpStatus.BAD_REQUEST,
@@ -69,12 +59,7 @@ describe("ErrorHandler", () => {
         },
       ]);
 
-      errorHandler.execute(
-        zodError,
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      errorHandler.execute(zodError, mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
       expect(mockResponse.json).toHaveBeenCalled();
@@ -96,12 +81,7 @@ describe("ErrorHandler", () => {
         },
       ]);
 
-      errorHandler.execute(
-        zodError,
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      errorHandler.execute(zodError, mockRequest as Request, mockResponse as Response, mockNext);
 
       const response = (mockResponse.json as any).mock.calls[0][0];
       expect(response.details[0]).toEqual({
@@ -113,16 +93,9 @@ describe("ErrorHandler", () => {
     it("deve tratar erro genérico e retornar 500", () => {
       const error = new Error("Something went wrong");
 
-      errorHandler.execute(
-        error,
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      errorHandler.execute(error, mockRequest as Request, mockResponse as Response, mockNext);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
       expect(mockResponse.json).toHaveBeenCalledWith({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: "Erro interno do servidor",
@@ -143,12 +116,7 @@ describe("ErrorHandler", () => {
         mockResponse.status = vi.fn().mockReturnThis();
         mockResponse.json = vi.fn().mockReturnThis();
 
-        errorHandler.execute(
-          error,
-          mockRequest as Request,
-          mockResponse as Response,
-          mockNext
-        );
+        errorHandler.execute(error, mockRequest as Request, mockResponse as Response, mockNext);
 
         expect(mockResponse.status).toHaveBeenCalledWith(status);
       });
@@ -174,12 +142,7 @@ describe("ErrorHandler", () => {
         },
       ]);
 
-      errorHandler.execute(
-        zodError,
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      errorHandler.execute(zodError, mockRequest as Request, mockResponse as Response, mockNext);
 
       const response = (mockResponse.json as any).mock.calls[0][0];
       expect(response.details).toHaveLength(2);
@@ -191,12 +154,7 @@ describe("ErrorHandler", () => {
       const error = new Error("Internal error");
       error.stack = "Stack trace here";
 
-      errorHandler.execute(
-        error,
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      errorHandler.execute(error, mockRequest as Request, mockResponse as Response, mockNext);
 
       const response = (mockResponse.json as any).mock.calls[0][0];
       expect(response.stack).toBeUndefined();
@@ -216,12 +174,7 @@ describe("ErrorHandler", () => {
         return mockResponse;
       });
 
-      errorHandler.execute(
-        error,
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      errorHandler.execute(error, mockRequest as Request, mockResponse as Response, mockNext);
 
       expect(callOrder).toEqual(["status", "json"]);
     });
