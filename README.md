@@ -28,6 +28,37 @@ curl -X POST http://z80ccg8g8cc4wc4w00gw844k.31.97.253.3.sslip.io/auth/login \
 
 ---
 
+## 📖 Documentação da API (Swagger)
+
+A API possui documentação interativa completa utilizando **Swagger/OpenAPI 3.0**.
+
+### Acesso à Documentação
+
+| Ambiente | URL |
+|----------|-----|
+| **Produção** | http://z80ccg8g8cc4wc4w00gw844k.31.97.253.3.sslip.io/api-docs |
+| **Desenvolvimento** | http://localhost:3000/api-docs |
+| **JSON Spec** | http://z80ccg8g8cc4wc4w00gw844k.31.97.253.3.sslip.io/api-docs.json |
+
+### Recursos da Documentação
+
+- **Interface interativa** - Teste endpoints diretamente no navegador
+- **Schemas completos** - Todos os DTOs e modelos documentados
+- **Autenticação JWT** - Suporte a Bearer token integrado
+- **Exemplos práticos** - Requisições e respostas de exemplo
+- **Códigos de status** - Documentação de todos os erros possíveis
+
+### Como Usar
+
+1. Acesse a documentação em `/api-docs`
+2. Para endpoints protegidos, faça login em `/auth/login`
+3. Copie o token JWT retornado
+4. Clique em **"Authorize"** no topo da página
+5. Cole o token no formato: `<seu-token>`
+6. Agora você pode testar todos os endpoints protegidos
+
+---
+
 ## 🚀 Tecnologias Utilizadas
 
 ### Backend
